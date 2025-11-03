@@ -1,18 +1,17 @@
-# License Manager Application
+# Leads Management Application
 
 ## Overview
 
-This is a web application for managing software licenses. It allows users to view their licenses, and administrators to manage users and their roles.
+This is a web application for managing sales leads. It allows users to view and manage leads, and administrators to manage users.
 
 ## Features
 
 *   **Authentication:** Users can log in to the application.
-*   **User Roles:** The application supports three user roles:
-    *   **Super Admin:** Can manage users and their roles.
-    *   **Admin:** (Not yet fully implemented)
-    *   **User:** Can view their own licenses.
-*   **License Management:** Users can view a list of their licenses.
-*   **User Management:** Super Admins can view a list of all users and edit their roles.
+*   **User Roles:** The application supports user roles, including "Super Admin".
+*   **Leads Management:**
+    *   View a list of leads.
+    *   View the details of a specific lead.
+*   **User Management (Super Admin):** Super Admins can manage users.
 *   **Dashboard:** A central page for users after they log in.
 *   **Routing:** The application uses `react-router-dom` for navigation.
 
@@ -24,12 +23,5 @@ The application uses Material-UI for its components and styling. It has a custom
 
 ### 2024-05-22
 
-*   **Bug Fix:** Fixed incorrect import paths in the following files:
-    *   `src/hooks/useAuth.ts`
-    *   `src/pages/dashboard/DashboardPage.tsx`
-    *   `src/components/auth/ProtectedRoute.tsx`
-    *   `src/pages/user/MyLicensePage.tsx`
-    *   `src/pages/user/ProfilePage.tsx`
-    *   `src/components/layout/Layout.tsx`
-    *   `src/pages/admin/UserManagementPage.tsx`
-    *   `src/pages/admin/LicensesPage.tsx`
+*   **Project Initialization:** Set up the basic structure for the Leads Management Application.
+*   **Bug Fix:** Fixed incorrect import paths in various files.
