@@ -1,17 +1,16 @@
 
 import React from 'react';
-import { Typography, Box, Grid } from '@mui/material';
-import UserManagementPage from './UserManagementPage';
+import { Typography, Box } from '@mui/material';
 
 const AdminPage: React.FC = () => {
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>Admin Dashboard</Typography>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <UserManagementPage />
-        </Grid>
-      </Grid>
+      <Typography variant="h4" gutterBottom>
+        Admin
+      </Typography>
+      <Typography variant="body1">
+        This is the admin page.
+      </Typography>
     </Box>
   );
 };

@@ -2,17 +2,17 @@
 import React from 'react';
 import { Typography, Box } from '@mui/material';
 
-const DashboardPage: React.FC = () => {
+const ProfilePage: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Dashboard
+        Profile
       </Typography>
       <Typography variant="body1">
-        Welcome to your dashboard. You can manage your account and licenses from the sidebar.
+        This is the profile page.
       </Typography>
     </Box>
   );
 };
 
-export default DashboardPage;
+export default ProfilePage;

@@ -2,17 +2,17 @@
 import React from 'react';
 import { Typography, Box } from '@mui/material';
 
-const DashboardPage: React.FC = () => {
+const LicensePage: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Dashboard
+        My License
       </Typography>
       <Typography variant="body1">
-        Welcome to your dashboard.
+        This is the license page.
       </Typography>
     </Box>
   );
 };
 
-export default DashboardPage;
+export default LicensePage;
