@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -8,49 +9,36 @@ import {
     Chip
 } from '@mui/material';
 import { ArrowBack as ArrowBackIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import FollowUpComponent from '../../components/leads/FollowUp';
-import type { FollowUp } from '../../models/follow-up';
-import { addFollowUp, getFollowUps, updateFollowUp, deleteFollowUp } from '../../services/follow-up-service';
-import type { Lead } from '../../services/db-service';
+import type { Lead } from '../../../services/db-service';
+import { getLead, updateLead, deleteLead } from '../../../services/db-service';
+import EditLeadModal from '../components/EditLeadModal';
+import FollowUpSection from '../components/FollowUpSection';
 
 const LeadDetailPage: React.FC = () => {
     const { leadId } = useParams<{ leadId: string }>();
     const navigate = useNavigate();
     const [lead, setLead] = useState<Lead | null>(null);
-    const [followUps, setFollowUps] = useState<FollowUp[]>([]);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     useEffect(() => {
-        // Fetch lead details and follow-ups
         if (leadId) {
-            // Mock lead data
-            setLead({
-                id: leadId,
-                name: 'John Doe',
-                email: 'john.doe@example.com',
-                phone: '123-456-7890',
-                company: 'Acme Inc.',
-                status: 'New',
-                source: 'Website',
-                createdDate: '2023-10-27',
-            });
-
-            getFollowUps(leadId).then(setFollowUps);
+            getLead(leadId).then(setLead);
         }
     }, [leadId]);
 
-    const handleAddFollowUp = async (leadId: string, notes: string, date: Date) => {
-        const newFollowUp = await addFollowUp(leadId, notes, date);
-        setFollowUps([...followUps, newFollowUp]);
+    const handleUpdateLead = async (updatedLead: Lead) => {
+        if (leadId) {
+            await updateLead(leadId, updatedLead);
+            const refreshedLead = await getLead(leadId);
+            setLead(refreshedLead);
+        }
     };
 
-    const handleUpdateFollowUp = async (followUp: FollowUp) => {
-        await updateFollowUp(followUp);
-        setFollowUps(followUps.map(f => f.id === followUp.id ? followUp : f));
-    };
-
-    const handleDeleteFollowUp = async (followUpId: string) => {
-        await deleteFollowUp(followUpId);
-        setFollowUps(followUps.filter(f => f.id !== followUpId));
+    const handleDelete = async () => {
+        if (leadId) {
+            await deleteLead(leadId);
+            navigate('/leads');
+        }
     };
 
     if (!lead) {
@@ -94,27 +82,24 @@ const LeadDetailPage: React.FC = () => {
                         <Typography variant="body2" color="text.secondary">Phone</Typography>
                         <Typography variant="body1">{lead.phone}</Typography>
                     </Box>
-                    <Box>
-                        <Typography variant="body2" color="text.secondary">Source</Typography>
-                        <Typography variant="body1">{lead.source}</Typography>
-                    </Box>
-                </Box>
-                
-                <Box sx={{ mt: 4 }}>
-                    <FollowUpComponent 
-                        leadId={lead.id} 
-                        followUps={followUps} 
-                        onAddFollowUp={handleAddFollowUp} 
-                        onUpdateFollowUp={handleUpdateFollowUp}
-                        onDeleteFollowUp={handleDeleteFollowUp}
-                    />
                 </Box>
 
                 <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                    <Button variant="outlined" startIcon={<EditIcon />}>Edit</Button>
-                    <Button variant="contained" color="error" startIcon={<DeleteIcon />}>Delete</Button>
+                    <Button variant="outlined" startIcon={<EditIcon />} onClick={() => setIsEditModalOpen(true)}>Edit</Button>
+                    <Button variant="contained" color="error" startIcon={<DeleteIcon />} onClick={handleDelete}>Delete</Button>
                 </Box>
             </Paper>
+            
+            {leadId && <FollowUpSection leadId={leadId} />}
+
+            {lead && (
+                <EditLeadModal 
+                    open={isEditModalOpen} 
+                    onClose={() => setIsEditModalOpen(false)} 
+                    lead={lead} 
+                    onUpdate={handleUpdateLead} 
+                />
+            )}
         </Box>
     );
 };

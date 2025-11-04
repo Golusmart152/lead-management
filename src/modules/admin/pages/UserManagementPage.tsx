@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
-import { db } from '../../firebase/config';
+import { db } from '../../../firebase/config';
 import { Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import EditUserModal from './EditUserModal';
+import EditUserModal from '../components/EditUserModal';
 
 interface User {
   id: string;

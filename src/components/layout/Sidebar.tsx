@@ -2,7 +2,17 @@
 import React from 'react';
 import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Box, useMediaQuery } from '@mui/material';
 import type { Theme } from '@mui/material';
-import { Dashboard as DashboardIcon, People as PeopleIcon, VpnKey as VpnKeyIcon, AccountCircle as AccountCircleIcon, Settings as SettingsIcon } from '@mui/icons-material';
+import { 
+    Dashboard as DashboardIcon, 
+    People as PeopleIcon, 
+    VpnKey as VpnKeyIcon, 
+    AccountCircle as AccountCircleIcon, 
+    Settings as SettingsIcon, 
+    Group as GroupIcon, 
+    Business as BusinessIcon, 
+    Work as WorkIcon,
+    Apartment as ApartmentIcon
+} from '@mui/icons-material';
 import { NavLink } from 'react-router-dom';
 
 interface SidebarProps {
@@ -15,8 +25,13 @@ const drawerWidth = 240;
 const navItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'Leads', icon: <PeopleIcon />, path: '/leads' },
+  { text: 'Employees', icon: <GroupIcon />, path: '/employees' },
+  { text: 'Products', icon: <BusinessIcon />, path: '/products' },
+  { text: 'Roles', icon: <WorkIcon />, path: '/roles' },
+  { text: 'Departments', icon: <ApartmentIcon />, path: '/departments' },
   { text: 'My License', icon: <VpnKeyIcon />, path: 'my-license' },
   { text: 'Profile', icon: <AccountCircleIcon />, path: '/profile' },
+  { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
   { text: 'Admin', icon: <SettingsIcon />, path: '/admin' },
 ];
 

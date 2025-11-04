@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Typography,
   Button,
@@ -12,41 +12,52 @@ import {
 } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import type { FollowUp } from '../../models/follow-up';
+import { getFollowUps, addFollowUp, updateFollowUp, deleteFollowUp } from '../../services/follow-up-service';
 
 interface FollowUpProps {
   leadId: string;
-  followUps: FollowUp[];
-  onAddFollowUp: (leadId: string, notes: string, date: Date) => void;
-  onUpdateFollowUp: (followUp: FollowUp) => void;
-  onDeleteFollowUp: (followUpId: string) => void;
 }
 
-const FollowUpComponent: React.FC<FollowUpProps> = ({ leadId, followUps, onAddFollowUp, onUpdateFollowUp, onDeleteFollowUp }) => {
+const FollowUpComponent: React.FC<FollowUpProps> = ({ leadId }) => {
+  const [followUps, setFollowUps] = useState<FollowUp[]>([]);
   const [notes, setNotes] = useState('');
   const [date, setDate] = useState(new Date());
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingFollowUp, setEditingFollowUp] = useState<FollowUp | null>(null);
 
-  const handleAddFollowUp = () => {
-    onAddFollowUp(leadId, notes, date);
+  useEffect(() => {
+    if (leadId) {
+      getFollowUps(leadId).then(setFollowUps);
+    }
+  }, [leadId]);
+
+  const handleAddFollowUp = async () => {
+    const newFollowUp = await addFollowUp(leadId, notes, date);
+    setFollowUps([...followUps, newFollowUp]);
     setNotes('');
   };
 
-  const handleOpenModal = (followUp: FollowUp) => {
-    setEditingFollowUp(followUp);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setEditingFollowUp(null);
-    setIsModalOpen(false);
-  };
-
-  const handleUpdateFollowUp = () => {
+  const handleUpdateFollowUp = async () => {
     if (editingFollowUp) {
-      onUpdateFollowUp(editingFollowUp);
-      handleCloseModal();
+      await updateFollowUp(editingFollowUp);
+      setFollowUps(followUps.map(f => f.id === editingFollowUp.id ? editingFollowUp : f));
+      handleCloseEditModal();
     }
+  };
+
+  const handleDeleteFollowUp = async (followUpId: string) => {
+    await deleteFollowUp(followUpId);
+    setFollowUps(followUps.filter(f => f.id !== followUpId));
+  };
+
+  const handleOpenEditModal = (followUp: FollowUp) => {
+    setEditingFollowUp(followUp);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditingFollowUp(null);
+    setIsEditModalOpen(false);
   };
 
   return (
@@ -58,10 +69,10 @@ const FollowUpComponent: React.FC<FollowUpProps> = ({ leadId, followUps, onAddFo
             key={followUp.id}
             secondaryAction={
               <>
-                <IconButton edge="end" aria-label="edit" onClick={() => handleOpenModal(followUp)}>
+                <IconButton edge="end" aria-label="edit" onClick={() => handleOpenEditModal(followUp)}>
                   <Edit />
                 </IconButton>
-                <IconButton edge="end" aria-label="delete" onClick={() => onDeleteFollowUp(followUp.id)}>
+                <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteFollowUp(followUp.id)}>
                   <Delete />
                 </IconButton>
               </>
@@ -89,7 +100,7 @@ const FollowUpComponent: React.FC<FollowUpProps> = ({ leadId, followUps, onAddFo
       <Button onClick={handleAddFollowUp} variant="contained" color="primary">
         Add Follow-up
       </Button>
-      <Modal open={isModalOpen} onClose={handleCloseModal}>
+      <Modal open={isEditModalOpen} onClose={handleCloseEditModal}>
         <Box sx={{ 
             position: 'absolute', 
             top: '50%', 
