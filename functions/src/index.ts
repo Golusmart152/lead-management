@@ -14,7 +14,7 @@ const client = new JWT({
 
 const sheets = google.sheets({ version: "v4", auth: client });
 
-export const createSheetLead = functions.https.onCall(async (data, _context) => {
+export const createSheetLead = functions.https.onCall(async (data) => {
   const { name, email } = data;
   try {
     await sheets.spreadsheets.values.append({
@@ -32,7 +32,7 @@ export const createSheetLead = functions.https.onCall(async (data, _context) => 
   }
 });
 
-export const updateSheetLead = functions.https.onCall(async (data, _context) => {
+export const updateSheetLead = functions.https.onCall(async (data) => {
   const { leadId, updatedData } = data;
   try {
     const range = `${leadsSheetName}!A${leadId}:B${leadId}`;
@@ -52,7 +52,7 @@ export const updateSheetLead = functions.https.onCall(async (data, _context) => 
   }
 });
 
-export const deleteSheetLead = functions.https.onCall(async (data, _context) => {
+export const deleteSheetLead = functions.https.onCall(async (data) => {
   const { leadId } = data;
   try {
     const range = `${leadsSheetName}!A${leadId}:B${leadId}`;

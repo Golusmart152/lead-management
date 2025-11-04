@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     Box, 
     Button, 
@@ -11,12 +10,18 @@ import {
     MenuItem, 
     Select, 
     InputLabel, 
-    FormControl 
+    FormControl,
+    IconButton,
 } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import type { GridColDef } from '@mui/x-data-grid';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
+import { getLeads, createLead, updateLead, deleteLead } from '../../services/db-service';
+import type { Lead } from '../../services/db-service';
+import EditLeadModal from './EditLeadModal';
+import { Edit, Delete, Visibility } from '@mui/icons-material';
 
 const modalStyle = {
   position: 'absolute',
@@ -30,39 +35,64 @@ const modalStyle = {
   p: 4,
 };
 
-const initialRows = [
-  { id: 1, name: 'John Doe', email: 'john.doe@example.com', phone: '123-456-7890', company: 'Acme Inc.', status: 'New' },
-  { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', phone: '098-765-4321', company: 'Beta Corp.', status: 'Contacted' },
-  { id: 3, name: 'Sam Wilson', email: 'sam.wilson@example.com', phone: '555-555-5555', company: 'Gamma LLC', status: 'Qualified' },
-];
-
 const LeadsListPage: React.FC = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
-    const [rows, setRows] = useState(initialRows);
-    const [newLead, setNewLead] = useState({
+    const [rows, setRows] = useState<Lead[]>([]);
+    const [newLead, setNewLead] = useState<Omit<Lead, 'id'>>({
         name: '',
         email: '',
         phone: '',
         company: '',
         status: 'New',
     });
+    const [editingLead, setEditingLead] = useState<Lead | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+    useEffect(() => {
+        fetchLeads();
+    }, []);
+
+    const fetchLeads = async () => {
+        const leads = await getLeads();
+        setRows(leads);
+    };
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setNewLead({ ...newLead, [name as string]: value });
     };
 
-    const handleAddLead = () => {
-        const id = rows.length > 0 ? Math.max(...rows.map(row => row.id)) + 1 : 1;
-        setRows([...rows, { ...newLead, id }]);
+    const handleSelectChange = (e: SelectChangeEvent) => {
+        const { name, value } = e.target;
+        setNewLead({ ...newLead, [name]: value });
+    };
+
+    const handleAddLead = async () => {
+        await createLead(newLead);
+        fetchLeads();
         handleClose();
         setNewLead({ name: '', email: '', phone: '', company: '', status: 'New' });
+    };
+
+    const handleEditLead = (lead: Lead) => {
+        setEditingLead(lead);
+        setIsEditModalOpen(true);
+    };
+
+    const handleUpdateLead = async (lead: Lead) => {
+        await updateLead(lead.id, lead);
+        fetchLeads();
+    };
+
+    const handleDeleteLead = async (id: string) => {
+        await deleteLead(id);
+        fetchLeads();
     };
     
     const columns: GridColDef[] = [
@@ -75,16 +105,20 @@ const LeadsListPage: React.FC = () => {
             field: 'actions',
             headerName: 'Actions',
             sortable: false,
-            flex: 1,
-            minWidth: 100,
+            flex: 1.5,
+            minWidth: 150,
             renderCell: (params) => (
-                <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => navigate(`/leads/${params.id}`)}
-                >
-                    View
-                </Button>
+                <Box>
+                    <IconButton onClick={() => navigate(`/leads/${params.id}`)}>
+                        <Visibility />
+                    </IconButton>
+                    <IconButton onClick={() => handleEditLead(params.row as Lead)}>
+                        <Edit />
+                    </IconButton>
+                    <IconButton onClick={() => handleDeleteLead(params.id as string)}>
+                        <Delete />
+                    </IconButton>
+                </Box>
             ),
         },
     ];
@@ -92,12 +126,12 @@ const LeadsListPage: React.FC = () => {
     return (
         <Box sx={{ p: { xs: 2, md: 3 } }}>
           <Grid container spacing={2} alignItems="center" mb={3}>
-            <Grid xs={12} sm>
+            <Grid item xs={12} sm>
               <Typography variant="h4" gutterBottom>
                 Leads Management
               </Typography>
             </Grid>
-            <Grid xs={12} sm="auto">
+            <Grid item xs={12} sm="auto">
               <Button variant="contained" onClick={handleOpen} fullWidth={isMobile}>
                 Create New Lead
               </Button>
@@ -114,7 +148,7 @@ const LeadsListPage: React.FC = () => {
               <TextField margin="normal" fullWidth label="Company" name="company" value={newLead.company} onChange={handleInputChange} />
               <FormControl fullWidth margin="normal">
                   <InputLabel>Status</InputLabel>
-                  <Select name="status" value={newLead.status} label="Status" onChange={handleInputChange as any}>
+                  <Select name="status" value={newLead.status} label="Status" onChange={handleSelectChange}>
                       <MenuItem value="New">New</MenuItem>
                       <MenuItem value="Contacted">Contacted</MenuItem>
                       <MenuItem value="Qualified">Qualified</MenuItem>
@@ -126,6 +160,12 @@ const LeadsListPage: React.FC = () => {
               </Button>
             </Box>
           </Modal>
+          <EditLeadModal 
+            open={isEditModalOpen} 
+            onClose={() => setIsEditModalOpen(false)} 
+            lead={editingLead} 
+            onUpdate={handleUpdateLead} 
+          />
           <Box sx={{ height: '70vh', width: '100%' }}>
             <DataGrid
                 rows={rows}

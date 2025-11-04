@@ -16,6 +16,11 @@ export interface Lead {
   id: string;
   name: string;
   email: string;
+  phone: string;
+  company: string;
+  status: 'New' | 'Contacted' | 'Qualified' | 'Lost';
+  source?: string;
+  createdDate?: string;
 }
 
 export interface Interaction {
@@ -41,7 +46,7 @@ export const getLeadById = async (id: string): Promise<Lead | null> => {
 
 export const createLead = async (lead: Omit<Lead, "id">): Promise<Lead> => {
   const docRef = await addDoc(leadsCollection, lead);
-  return { id: docRef.id, ...lead };
+  return { id: docRef.id, ...lead } as Lead;
 };
 
 export const updateLead = async (
