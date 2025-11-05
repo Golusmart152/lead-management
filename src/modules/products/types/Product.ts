@@ -5,7 +5,8 @@ export interface Product {
     visibleId: string;
     name: string;
     description: string;
-    price?: number;
+    price: number;
     category: string;
     type: 'Product' | 'Service';
+
 }

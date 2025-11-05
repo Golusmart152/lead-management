@@ -1,3 +1,5 @@
+import type { Role } from '../../roles/types';
+import type { Department } from '../../departments/types';
 
 export interface Employee {
     id: string;
@@ -6,7 +8,6 @@ export interface Employee {
     name: string;
     email: string;
     phone: string;
-    roles: string[];
-    departments: string[];
-    productOrService: string;
+    role: Role;
+    department: Department;
 }

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Drawer, Toolbar, useTheme, useMediaQuery } from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Drawer, Toolbar, useTheme, useMediaQuery, ListSubheader } from '@mui/material';
 import {
     Dashboard as DashboardIcon,
     People as PeopleIcon,
@@ -10,8 +10,8 @@ import {
     BarChart as BarChartIcon,
     Settings as SettingsIcon,
     Help as HelpIcon,
-    Rule as RuleIcon,
-    Business as BusinessIcon
+    Business as BusinessIcon,
+    Description as DescriptionIcon,
 } from '@mui/icons-material';
 
 const drawerWidth = 240;
@@ -54,7 +54,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                         { text: 'Reports', to: '/reports', icon: <BarChartIcon /> },
                         { text: 'Settings', to: '/settings', icon: <SettingsIcon /> },
                         { text: 'Support', to: '/support', icon: <HelpIcon /> },
-                        { text: 'Rules', to: '/rules', icon: <RuleIcon /> },
+                    ].map((item) => (
+                        <ListItem key={item.text} disablePadding component={Link} to={item.to} onClick={isMobile ? onClose : undefined}>
+                            <ListItemButton selected={location.pathname.startsWith(item.to)}>
+                                <ListItemIcon>{item.icon}</ListItemIcon>
+                                <ListItemText primary={item.text} />
+                            </ListItemButton>
+                        </ListItem>
+                    ))
+                }
+            </List>
+            <Divider />
+            <List>
+                <ListSubheader>Admin</ListSubheader>
+                {
+                    [
+                        { text: 'Logs', to: '/admin/logs', icon: <DescriptionIcon /> },
                     ].map((item) => (
                         <ListItem key={item.text} disablePadding component={Link} to={item.to} onClick={isMobile ? onClose : undefined}>
                             <ListItemButton selected={location.pathname.startsWith(item.to)}>

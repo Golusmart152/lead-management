@@ -1,18 +1,14 @@
 
 import React from 'react';
-import { Typography, Box } from '@mui/material';
+import { Typography } from '@mui/material';
 
 const SupportPage: React.FC = () => {
-  return (
-    <Box>
-      <Typography variant="h4" gutterBottom>
-        Support
-      </Typography>
-      <Typography variant="body1">
-        Get help and support here.
-      </Typography>
-    </Box>
-  );
+    return (
+        <div>
+            <Typography variant="h4">Support Page</Typography>
+            <Typography variant="body1">This page will provide support information.</Typography>
+        </div>
+    );
 };
 
 export default SupportPage;

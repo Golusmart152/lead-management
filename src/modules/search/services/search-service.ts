@@ -42,12 +42,12 @@ export const search = async (query: string): Promise<SearchResult[]> => {
     // Search Leads
     const leads = await getLeads();
     leads
-        .filter(lead => lead.company.toLowerCase().includes(lowerCaseQuery))
+        .filter(lead => lead.company && lead.company.toLowerCase().includes(lowerCaseQuery))
         .forEach(lead => {
             results.push({
                 id: lead.id,
                 module: 'Leads',
-                title: lead.company,
+                title: lead.company || '',
                 url: `/leads/${lead.id}`,
             });
         });

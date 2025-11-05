@@ -14,7 +14,6 @@ import {
 import { generateUUID } from "../../../utils/idGenerator";
 import { generateVisibleId } from "../../../services/id-service";
 import type { Product } from "../types";
-import { addLog } from "../../logs/services/log-service";
 
 const productsCollection = collection(db, "products");
 
@@ -29,18 +28,13 @@ export const getProduct = async (id: string): Promise<Product | null> => {
     return docSnap.exists() ? ({ id: docSnap.id, ...docSnap.data() } as Product) : null;
 };
 
-export const addProduct = async (product: Omit<Product, 'id' | 'uuid' | 'visibleId'>): Promise<Product> => {
+export const addProduct = async (product: Omit<Product, 'id'>): Promise<Product> => {
     const newProductData = {
         ...product,
         uuid: generateUUID(),
         visibleId: await generateVisibleId('P', 'products')
     }
     const docRef = await addDoc(productsCollection, newProductData);
-    addLog({
-        action: "create",
-        module: "products-services",
-        details: `Created new product/service: ${product.name}`,
-    });
     return { id: docRef.id, ...newProductData } as Product;
 };
 
@@ -51,19 +45,9 @@ export const updateProduct = async (
     const docRef = doc(db, "products", id);
     const updateData = { ...updates };
     await updateDoc(docRef, updateData);
-    addLog({
-        action: "update",
-        module: "products-services",
-        details: `Updated product/service: ${updates.name}`,
-    });
 };
 
-export const deleteProduct = async (id: string, productName: string): Promise<void> => {
+export const deleteProduct = async (id: string): Promise<void> => {
     const docRef = doc(db, "products", id);
     await deleteDoc(docRef);
-    addLog({
-        action: "delete",
-        module: "products-services",
-        details: `Deleted product/service: ${productName}`,
-    });
 };

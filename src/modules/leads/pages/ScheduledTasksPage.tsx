@@ -7,12 +7,12 @@ import {
     Tooltip
 } from '@mui/material';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
-import { 
-    getAllFollowUps, 
-    updateFollowUp, 
-    deleteFollowUp 
-} from '../../../services/db-service';
-import type { FollowUpWithLead, FollowUp } from '../../../services/db-service';
+import {
+    getAllFollowUps,
+    updateFollowUp,
+    deleteFollowUp
+} from '../services/lead-service';
+import type { FollowUp, FollowUpWithLead } from '../../../services/db-service';
 import { useNotification } from '../../notifications/useNotification';
 import EditFollowUpModal from '../components/EditFollowUpModal';
 import { Edit, Delete, CheckCircle } from '@mui/icons-material';
@@ -29,11 +29,11 @@ const ScheduledTasksPage: React.FC = () => {
 
     const fetchFollowUps = async () => {
         const allFollowUps = await getAllFollowUps();
-        setFollowUps(allFollowUps);
+        setFollowUps(allFollowUps as FollowUpWithLead[]);
     };
 
     const handleMarkAsCompleted = async (id: string) => {
-        await updateFollowUp(id, { status: 'Completed' });
+        await updateFollowUp(id, { status: 'Completed' } as Partial<FollowUp>);
         fetchFollowUps();
         showNotification('Task marked as completed!', 'success');
     };
@@ -95,7 +95,7 @@ const ScheduledTasksPage: React.FC = () => {
             renderCell: (params) => (
                 <Box>
                     <Tooltip title="Edit">
-                        <IconButton onClick={() => handleOpenEditModal(params.row)}>
+                        <IconButton onClick={() => handleOpenEditModal(params.row as FollowUp)}>
                             <Edit />
                         </IconButton>
                     </Tooltip>
@@ -146,7 +146,7 @@ const ScheduledTasksPage: React.FC = () => {
             <EditFollowUpModal 
                 open={isEditModalOpen}
                 onClose={handleCloseEditModal}
-                followUp={selectedFollowUp}
+                followUp={selectedFollowUp as FollowUp}
                 onUpdate={handleUpdateFollowUp}
             />
         </Box>

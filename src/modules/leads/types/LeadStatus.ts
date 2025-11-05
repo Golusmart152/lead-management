@@ -1,0 +1,1 @@
+export type LeadStatus = 'new' | 'contacted' | 'qualified' | 'unqualified' | 'proposal' | 'negotiation' | 'won' | 'lost';

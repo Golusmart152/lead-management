@@ -9,7 +9,8 @@ import {
     ListItem, 
     ListItemText, 
     Typography, 
-    InputAdornment 
+    InputAdornment, 
+    ListItemButton 
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -107,13 +108,12 @@ const SearchComponent: React.FC = () => {
                                                 </Typography>
                                             </ListItem>
                                             {items.map(item => (
-                                                <ListItem 
-                                                    button 
+                                                <ListItemButton 
                                                     key={item.id} 
                                                     onClick={() => handleResultClick(item.url)}
                                                 >
                                                     <ListItemText primary={item.title} />
-                                                </ListItem>
+                                                </ListItemButton>
                                             ))}
                                         </React.Fragment>
                                     ))}

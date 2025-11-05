@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, type SubmitHandler } from 'react-hook-form';
 import {
     Button,
     TextField,
@@ -8,37 +8,36 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
-    Grid,
     MenuItem,
     Select,
     FormControl,
     InputLabel,
     IconButton,
     Typography,
+    Box,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import type { Product } from '../types';
+import { type Product } from '../types';
 
 interface ProductFormProps {
     open: boolean;
     onClose: () => void;
-    onSubmit: (product: Omit<Product, 'id' | 'uuid' | 'visibleId'> | Product) => void;
+    onSubmit: (product: Omit<Product, 'id'> | Product) => void;
     product?: Product | null;
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSubmit, product }) => {
-    const { control, handleSubmit, watch, reset, formState: { errors } } = useForm<Omit<Product, 'id' | 'uuid' | 'visibleId'> | Product>({
+    const { control, handleSubmit, reset, formState: { errors } } = useForm<Omit<Product, 'id'> | Product>({
         defaultValues: {
             name: '',
             description: '',
             price: 0,
             category: '',
-            type: 'Product',
+            stock: 0,
+            imageUrl: '',
         }
     });
-
-    const productType = watch('type');
 
     useEffect(() => {
         if (open) {
@@ -47,12 +46,18 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSubmit, prod
                 description: '',
                 price: 0,
                 category: '',
-                type: 'Product',
-            });
+                stock: 0,
+                imageUrl: '',
+            } as Omit<Product, 'id'>);
         }
     }, [product, open, reset]);
 
-    const MotionGrid = motion(Grid);
+    const MotionBox = motion(Box);
+
+    const handleFormSubmit: SubmitHandler<Omit<Product, 'id'> | Product> = (data) => {
+        onSubmit(data);
+        onClose();
+    };
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
@@ -62,41 +67,37 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSubmit, prod
                     <CloseIcon />
                 </IconButton>
             </DialogTitle>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(handleFormSubmit)}>
                 <DialogContent sx={{ p: 4, bgcolor: 'background.default' }}>
-                    <Grid container spacing={3}>
-                        <MotionGrid item xs={12} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                        <MotionBox initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
                             <Controller
                                 name="name"
                                 control={control}
                                 rules={{ required: 'Name is required' }}
                                 render={({ field }) => <TextField {...field} label="Product Name" fullWidth variant="outlined" error={!!errors.name} helperText={errors.name?.message} />}
                             />
-                        </MotionGrid>
-                        <MotionGrid item xs={12} sm={6} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-                            <Controller
-                                name="type"
-                                control={control}
-                                render={({ field }) => (
-                                    <FormControl fullWidth variant="outlined">
-                                        <InputLabel>Type</InputLabel>
-                                        <Select {...field} label="Type">
-                                            <MenuItem value="Product">Product</MenuItem>
-                                            <MenuItem value="Service">Service</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                )}
-                            />
-                        </MotionGrid>
-                        <MotionGrid item xs={12} sm={6} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-                            <Controller
-                                name="category"
-                                control={control}
-                                rules={{ required: 'Category is required' }}
-                                render={({ field }) => <TextField {...field} label="Category" fullWidth variant="outlined" error={!!errors.category} helperText={errors.category?.message} />}
-                            />
-                        </MotionGrid>
-                        <MotionGrid item xs={12} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+                        </MotionBox>
+                        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 3 }}>
+                            <MotionBox sx={{ flex: 1 }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+                                <FormControl fullWidth variant="outlined">
+                                    <InputLabel>Type</InputLabel>
+                                    <Select label="Type" defaultValue="Product">
+                                        <MenuItem value="Product">Product</MenuItem>
+                                        <MenuItem value="Service">Service</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </MotionBox>
+                            <MotionBox sx={{ flex: 1 }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+                                <Controller
+                                    name="category"
+                                    control={control}
+                                    rules={{ required: 'Category is required' }}
+                                    render={({ field }) => <TextField {...field} label="Category" fullWidth variant="outlined" error={!!errors.category} helperText={errors.category?.message} />}
+                                />
+                            </MotionBox>
+                        </Box>
+                        <MotionBox initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
                             <Controller
                                 name="description"
                                 control={control}
@@ -114,20 +115,18 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSubmit, prod
                                     />
                                 )}
                             />
-                        </MotionGrid>
-                        {productType === 'Product' && (
-                            <MotionGrid item xs={12} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-                                <Controller
-                                    name="price"
-                                    control={control}
-                                    rules={{ required: 'Price is required', min: { value: 0, message: 'Price cannot be negative' } }}
-                                    render={({ field }) => (
-                                        <TextField {...field} label="Price" type="number" fullWidth variant="outlined" error={!!errors.price} helperText={errors.price?.message} />
-                                    )}
-                                />
-                            </MotionGrid>
-                        )}
-                    </Grid>
+                        </MotionBox>
+                        <MotionBox initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+                            <Controller
+                                name="price"
+                                control={control}
+                                rules={{ required: 'Price is required', min: { value: 0, message: 'Price cannot be negative' } }}
+                                render={({ field }) => (
+                                    <TextField {...field} label="Price" type="number" fullWidth variant="outlined" error={!!errors.price} helperText={errors.price?.message} />
+                                )}
+                            />
+                        </MotionBox>
+                    </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 2, bgcolor: 'background.default' }}>
                     <Button onClick={onClose} color="secondary">Cancel</Button>

@@ -12,21 +12,9 @@ import {
   orderBy,
   where,
 } from "firebase/firestore";
-import { generateUUID } from "../utils/idGenerator";
-import { generateVisibleId } from "./id-service";
+import type { Lead, LeadStatus } from "../modules/leads/types";
 
-export type LeadStatus = 'New' | 'Contacted' | 'Follow-Up Scheduled' | 'Interested' | 'Not Interested' | 'Callback Requested' | 'In Progress / Under Discussion' | 'Converted / Closed-Won' | 'Lost / Closed-Lost' | 'Disqualified';
-
-export interface Lead {
-  id: string;
-  uuid: string;
-  visibleId: string;
-  name: string;
-  email: string;
-  phone: string;
-  company: string;
-  status: LeadStatus;
-}
+export type { Lead, LeadStatus };
 
 export interface Interaction {
   id: string;
@@ -57,7 +45,7 @@ const leadsCollection = collection(db, "leads");
 const followUpsCollection = collection(db, "followUps");
 
 export const getLeads = async (): Promise<Lead[]> => {
-  const snapshot = await getDocs(query(leadsCollection, orderBy("name")));
+  const snapshot = await getDocs(query(leadsCollection, orderBy("createdAt", "desc")));
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Lead));
 };
 
@@ -67,14 +55,9 @@ export const getLead = async (id: string): Promise<Lead | null> => {
   return docSnap.exists() ? ({ id: docSnap.id, ...docSnap.data() } as Lead) : null;
 };
 
-export const createLead = async (lead: Omit<Lead, "id" | "uuid" | "visibleId">): Promise<Lead> => {
-  const newLead = {
-    ...lead,
-    uuid: generateUUID(),
-    visibleId: await generateVisibleId('L', 'leads')
-  }
-  const docRef = await addDoc(leadsCollection, newLead);
-  return { id: docRef.id, ...newLead } as Lead;
+export const createLead = async (lead: Omit<Lead, "id">): Promise<Lead> => {
+  const docRef = await addDoc(leadsCollection, lead);
+  return { id: docRef.id, ...lead } as Lead;
 };
 
 export const updateLead = async (
@@ -109,7 +92,7 @@ export const getAllFollowUps = async (): Promise<FollowUpWithLead[]> => {
             followUpsWithLead.push({
                 ...followUp,
                 clientName: lead.name,
-                clientPhone: lead.phone,
+                clientPhone: lead.phone ?? 'N/A',
                 taskType: followUp.type || ''
             });
         }

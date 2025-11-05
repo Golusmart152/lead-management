@@ -12,7 +12,7 @@ const firebaseConfig = {
   "appId": "1:941304879321:web:60bf473af225fadb3106c8",
   "storageBucket": "licencning.firebasestorage.app",
   "apiKey": "AIzaSyASblu1Utxbtu_u19_ZH54IVEonZeZrO5I",
-  "authDomain": "licencning.firebaseapp.com",
+  "authDomain": "9000-firebase-lead-management-1762188289620.cluster-bqwaigqtxbeautecnatk4o6ynk.cloudworkstations.dev",
   "messagingSenderId": "941304879321",
   "measurementId": "G-SNK233BQN1"
 };

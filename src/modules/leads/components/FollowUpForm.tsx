@@ -20,7 +20,7 @@ interface FollowUpFormProps {
 const FollowUpForm: React.FC<FollowUpFormProps> = ({ leadId, onFollowUpAdded }) => {
     const [notes, setNotes] = useState('');
     const [dueDate, setDueDate] = useState('');
-    const [status, setStatus] = useState('Pending');
+    const [status, setStatus] = useState<'Pending' | 'Completed'>('Pending');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -69,7 +69,7 @@ const FollowUpForm: React.FC<FollowUpFormProps> = ({ leadId, onFollowUpAdded }) 
                 <Select
                     value={status}
                     label="Status"
-                    onChange={(e) => setStatus(e.target.value)}
+                    onChange={(e) => setStatus(e.target.value as 'Pending' | 'Completed')}
                 >
                     <MenuItem value="Pending">Pending</MenuItem>
                     <MenuItem value="Completed">Completed</MenuItem>

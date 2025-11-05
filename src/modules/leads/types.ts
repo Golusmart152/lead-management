@@ -1,11 +1,14 @@
 
+export type LeadStatus = 'new' | 'contacted' | 'qualified' | 'unqualified' | 'proposal' | 'negotiation' | 'won' | 'lost';
+
 export interface Lead {
     id: string;
-    visibleId: string;
-    company: string;
-    contactPerson: string;
-    phone: string;
+    name: string;
     email: string;
-    status: 'new' | 'contacted' | 'qualified' | 'lost';
-    source: string;
+    company?: string;
+    phone?: string;
+    status: LeadStatus;
+    createdAt: Date;
+    updatedAt: Date;
+    [key: string]: any;
 }

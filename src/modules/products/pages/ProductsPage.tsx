@@ -6,7 +6,6 @@ import {
     Typography, 
     CircularProgress, 
     Alert, 
-    Grid, 
     Card, 
     CardContent, 
     CardActions 
@@ -14,7 +13,7 @@ import {
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, ArrowForward as ArrowForwardIcon } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { getProducts, addProduct, updateProduct, deleteProduct } from '../services/product-service';
-import type { Product } from '../types';
+import { type Product } from '../types';
 import ProductForm from '../components/ProductForm';
 
 const ProductsPage: React.FC = () => {
@@ -29,7 +28,7 @@ const ProductsPage: React.FC = () => {
             setLoading(true);
             const data = await getProducts();
             setProducts(data);
-        } catch (_err) {
+        } catch {
             setError('Failed to fetch products. Please try again later.');
         } finally {
             setLoading(false);
@@ -50,16 +49,16 @@ const ProductsPage: React.FC = () => {
         setIsFormOpen(false);
     }, []);
 
-    const handleFormSubmit = useCallback(async (productData: Omit<Product, 'id' | 'uuid' | 'visibleId'>) => {
+    const handleFormSubmit = useCallback(async (productData: Product | Omit<Product, 'id'>) => {
         try {
             if (selectedProduct) {
                 await updateProduct(selectedProduct.id, productData as Product);
             } else {
-                await addProduct(productData);
+                await addProduct(productData as Omit<Product, 'id'>);
             }
             fetchProducts();
             handleFormClose();
-        } catch (_err) {
+        } catch {
             setError('Failed to save product.');
         }
     }, [fetchProducts, handleFormClose, selectedProduct]);
@@ -68,7 +67,7 @@ const ProductsPage: React.FC = () => {
         try {
             await deleteProduct(id);
             fetchProducts();
-        } catch (_err) {
+        } catch {
             setError('Failed to delete product.');
         }
     }, [fetchProducts]);
@@ -98,23 +97,21 @@ const ProductsPage: React.FC = () => {
         }
 
         return (
-            <Grid container spacing={3}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' }, gap: 3 }}>
                 {products.map((product) => (
-                    <Grid item xs={12} sm={6} md={4} key={product.id}>
-                        <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                            <CardContent sx={{ flexGrow: 1 }}>
-                                <Typography variant="h6">{product.name}</Typography>
-                                <Typography variant="body2" color="text.secondary">${product.price.toFixed(2)}</Typography>
-                            </CardContent>
-                            <CardActions>
-                                <Button component={Link} to={`/products/${product.id}`}><ArrowForwardIcon /></Button>
-                                <Button onClick={() => handleFormOpen(product)}><EditIcon /></Button>
-                                <Button onClick={() => handleDelete(product.id)}><DeleteIcon /></Button>
-                            </CardActions>
-                        </Card>
-                    </Grid>
+                    <Card key={product.id} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                        <CardContent sx={{ flexGrow: 1 }}>
+                            <Typography variant="h6">{product.name}</Typography>
+                            <Typography variant="body2" color="text.secondary">${product.price?.toFixed(2)}</Typography>
+                        </CardContent>
+                        <CardActions>
+                            <Button component={Link} to={`/products/${product.id}`}><ArrowForwardIcon /></Button>
+                            <Button onClick={() => handleFormOpen(product)}><EditIcon /></Button>
+                            <Button onClick={() => handleDelete(product.id)}><DeleteIcon /></Button>
+                        </CardActions>
+                    </Card>
                 ))}
-            </Grid>
+            </Box>
         );
     }, [loading, error, products, handleDelete, handleFormOpen]);
 

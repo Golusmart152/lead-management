@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
-import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem, useMediaQuery } from '@mui/material';
-import type { Theme } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem } from '@mui/material';
 import { Menu as MenuIcon, AccountCircle } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
@@ -17,7 +16,6 @@ const Header: React.FC<HeaderProps> = ({ onDrawerToggle }) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const { user } = useAuth();
     const navigate = useNavigate();
-    const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
 
     const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -28,9 +26,15 @@ const Header: React.FC<HeaderProps> = ({ onDrawerToggle }) => {
     };
 
     const handleLogout = async () => {
+        handleClose();
         await auth.signOut();
         navigate('/login');
     };
+
+    const handleSettings = () => {
+        handleClose();
+        navigate('/settings');
+    }
 
     return (
         <AppBar
@@ -80,7 +84,7 @@ const Header: React.FC<HeaderProps> = ({ onDrawerToggle }) => {
                             open={Boolean(anchorEl)}
                             onClose={handleClose}
                         >
-                            <MenuItem onClick={() => navigate('/profile')}>Profile</MenuItem>
+                            <MenuItem onClick={handleSettings}>Settings</MenuItem>
                             <MenuItem onClick={handleLogout}>Logout</MenuItem>
                         </Menu>
                     </div>
