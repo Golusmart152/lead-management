@@ -1,59 +1,56 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { ReactNode } from 'react';
+import { auth } from '../firebase/config';
+import type { User as FirebaseUser } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { getUserProfile } from '../services/user-service';
 import { AuthContext } from './AuthContext';
-import type { AuthUser } from './AuthContext';
-import type { IdTokenResult } from 'firebase/auth';
+import type { AuthUser, AuthContextType, Role } from '../types';
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(false);
+interface AuthProviderProps {
+    children: ReactNode;
+}
 
-  const login = () => {
-    setLoading(true);
-    const mockUser: AuthUser = {
-      uid: 'mock-uid',
-      email: 'mock@example.com',
-      displayName: 'Mock User',
-      photoURL: 'https://example.com/mock-photo.jpg',
-      emailVerified: true,
-      isAnonymous: false,
-      providerData: [],
-      metadata: {},
-      refreshToken: 'mock-refresh-token',
-      tenantId: null,
-      delete: async () => {},
-      getIdToken: async () => 'mock-id-token',
-      getIdTokenResult: async () => ({
-        token: 'mock-id-token',
-        expirationTime: '',
-        authTime: '',
-        issuedAtTime: '',
-        signInProvider: null,
-        signInSecondFactor: null,
-        claims: {},
-      } as IdTokenResult),
-      reload: async () => {},
-      toJSON: () => ({}),
-      role: 'Super Admin',
-      providerId: "",
-      phoneNumber: null,
-    };
-    setTimeout(() => {
-      setUser(mockUser);
-      setLoading(false);
-    }, 1000);
-  };
+const defaultRole: Role = { id: 'user', name: 'User' };
 
-  const logout = () => {
-    setUser(null);
-  };
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+    const [user, setUser] = useState<AuthUser | null>(null);
+    const [loading, setLoading] = useState(true);
 
-  const value = { user, loading, login, logout };
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(async (firebaseUser: FirebaseUser | null) => {
+            setLoading(true);
+            if (firebaseUser) {
+                try {
+                    const userProfile = await getUserProfile(firebaseUser.uid);
+                    setUser({ ...firebaseUser, role: userProfile.role || defaultRole });
+                } catch (error) {
+                    console.error("Failed to fetch user profile:", error);
+                    setUser({ ...firebaseUser, role: defaultRole });
+                }
+            } else {
+                setUser(null);
+            }
+            setLoading(false);
+        });
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+        return () => unsubscribe();
+    }, []);
+
+    const signIn = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password);
+    const logOut = () => signOut(auth);
+
+    const authContextValue: AuthContextType = useMemo(() => ({
+        user,
+        loading,
+        signIn,
+        signOut: logOut,
+    }), [user, loading]);
+
+    return (
+        <AuthContext.Provider value={authContextValue}>
+            {children}
+        </AuthContext.Provider>
+    );
 };

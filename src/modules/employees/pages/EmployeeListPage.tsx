@@ -17,15 +17,12 @@ import {
     InputLabel,
     Select,
     MenuItem,
-    Grid
 } from '@mui/material';
 import { Add, Edit, Delete, Visibility } from '@mui/icons-material';
 import { getEmployees, addEmployee, updateEmployee, deleteEmployee } from '../services/employee-service';
 import { getRoles } from '../../roles/services/role-service';
 import { getDepartments } from '../../departments/services/department-service';
-import type { Employee } from '../types';
-import type { Role } from '../../../types';
-import type { Department } from '../../../types';
+import type { Employee, Role, Department } from '../../../types';
 import EmployeeForm from '../components/EmployeeForm';
 
 const EmployeeListPage: React.FC = () => {
@@ -58,10 +55,10 @@ const EmployeeListPage: React.FC = () => {
     useEffect(() => {
         let filtered = employees;
         if (selectedRole) {
-            filtered = filtered.filter(employee => employee.roles.includes(selectedRole));
+            filtered = filtered.filter(employee => employee.role.id === selectedRole);
         }
         if (selectedDepartment) {
-            filtered = filtered.filter(employee => employee.departments.includes(selectedDepartment));
+            filtered = filtered.filter(employee => employee.department.id === selectedDepartment);
         }
         setFilteredEmployees(filtered);
     }, [employees, selectedRole, selectedDepartment]);
@@ -100,40 +97,6 @@ const EmployeeListPage: React.FC = () => {
                     Add New Employee
                 </Button>
             </Box>
-            <Box sx={{ mb: 3 }}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6}>
-                        <FormControl fullWidth>
-                            <InputLabel>Filter by Role</InputLabel>
-                            <Select
-                                value={selectedRole}
-                                label="Filter by Role"
-                                onChange={(e) => setSelectedRole(e.target.value as string)}
-                            >
-                                <MenuItem value=""><em>All Roles</em></MenuItem>
-                                {roles.map(role => (
-                                    <MenuItem key={role.id} value={role.name}>{role.name}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <FormControl fullWidth>
-                            <InputLabel>Filter by Department</InputLabel>
-                            <Select
-                                value={selectedDepartment}
-                                label="Filter by Department"
-                                onChange={(e) => setSelectedDepartment(e.target.value as string)}
-                            >
-                                <MenuItem value=""><em>All Departments</em></MenuItem>
-                                {departments.map(department => (
-                                    <MenuItem key={department.id} value={department.name}>{department.name}</MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                </Grid>
-            </Box>
 
             <EmployeeForm
                 open={isFormOpen}
@@ -150,9 +113,36 @@ const EmployeeListPage: React.FC = () => {
                             <TableCell>Name</TableCell>
                             <TableCell>Email</TableCell>
                             <TableCell>Phone</TableCell>
-                            <TableCell>Role</TableCell>
-                            <TableCell>Department</TableCell>
-                            <TableCell>Product/Service</TableCell>
+                            <TableCell sx={{ minWidth: 150 }}>
+                                <FormControl fullWidth size="small">
+                                    <InputLabel>Role</InputLabel>
+                                    <Select
+                                        value={selectedRole}
+                                        label="Role"
+                                        onChange={(e) => setSelectedRole(e.target.value as string)}
+                                    >
+                                        <MenuItem value=""><em>All</em></MenuItem>
+                                        {roles.map(role => (
+                                            <MenuItem key={role.id} value={role.id}>{role.name}</MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </TableCell>
+                            <TableCell sx={{ minWidth: 150 }}>
+                                <FormControl fullWidth size="small">
+                                    <InputLabel>Department</InputLabel>
+                                    <Select
+                                        value={selectedDepartment}
+                                        label="Department"
+                                        onChange={(e) => setSelectedDepartment(e.target.value as string)}
+                                    >
+                                        <MenuItem value=""><em>All</em></MenuItem>
+                                        {departments.map(department => (
+                                            <MenuItem key={department.id} value={department.id}>{department.name}</MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </TableCell>
                             <TableCell>Actions</TableCell>
                         </TableRow>
                     </TableHead>
@@ -165,9 +155,8 @@ const EmployeeListPage: React.FC = () => {
                                 <TableCell>{employee.name}</TableCell>
                                 <TableCell>{employee.email}</TableCell>
                                 <TableCell>{employee.phone}</TableCell>
-                                <TableCell>{employee.roles.join(', ')}</TableCell>
-                                <TableCell>{employee.departments.join(', ')}</TableCell>
-                                <TableCell>{employee.productOrService}</TableCell>
+                                <TableCell>{employee.role.name}</TableCell>
+                                <TableCell>{employee.department.name}</TableCell>
                                 <TableCell>
                                     <IconButton component={Link} to={`/employees/${employee.id}`}>
                                         <Visibility />

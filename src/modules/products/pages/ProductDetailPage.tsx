@@ -12,11 +12,11 @@ import {
     Paper
 } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
-import { getProductOrService } from '../services/product-service';
-import type { ProductOrService } from '../services/product-service';
+import { getProduct } from '../services/product-service';
+import type { Product } from '../types';
 
-const ProductServiceDetailPage: React.FC = () => {
-    const [product, setProduct] = useState<ProductOrService | null>(null);
+const ProductDetailPage: React.FC = () => {
+    const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -25,7 +25,7 @@ const ProductServiceDetailPage: React.FC = () => {
         const fetchProduct = async () => {
             if (id) {
                 try {
-                    const fetchedProduct = await getProductOrService(id);
+                    const fetchedProduct = await getProduct(id);
                     setProduct(fetchedProduct);
                 } catch (error) {
                     console.error("Error fetching product:", error);
@@ -69,7 +69,7 @@ const ProductServiceDetailPage: React.FC = () => {
                             <CardContent>
                                 <Typography variant="h6" gutterBottom>Details</Typography>
                                 <Typography variant="body1"><strong>UUID:</strong> {product.uuid}</Typography>
-                                <Typography variant="body1"><strong>Type:</strong> {product.type}</Typography>
+                                <Typography variant="body1"><strong>Price:</strong> ${product.price.toFixed(2)}</Typography>
                             </CardContent>
                         </Card>
                     </Grid>
@@ -87,4 +87,4 @@ const ProductServiceDetailPage: React.FC = () => {
     );
 };
 
-export default ProductServiceDetailPage;
+export default ProductDetailPage;

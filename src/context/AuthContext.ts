@@ -1,19 +1,10 @@
 
 import { createContext } from 'react';
-import type { User } from 'firebase/auth';
+import type { AuthContextType } from '../types';
 
-// Define the shape of our user object, including the custom 'role' field
-export interface AuthUser extends User {
-  role?: string;
-}
-
-// Define the shape of the context state
-export interface AuthContextType {
-  user: AuthUser | null;
-  loading: boolean;
-  login: () => void;
-  logout: () => void;
-}
-
-// Create the context with a default value
-export const AuthContext = createContext<AuthContextType>({ user: null, loading: true, login: () => {}, logout: () => {} });
+export const AuthContext = createContext<AuthContextType>({
+    user: null,
+    loading: true,
+    signIn: () => Promise.resolve(),
+    signOut: () => Promise.resolve(),
+});

@@ -13,7 +13,7 @@ import {
     deleteFollowUp 
 } from '../../../services/db-service';
 import type { FollowUpWithLead, FollowUp } from '../../../services/db-service';
-import { useNotification } from '../../../modules/notifications/NotificationProvider';
+import { useNotification } from '../../notifications/useNotification';
 import EditFollowUpModal from '../components/EditFollowUpModal';
 import { Edit, Delete, CheckCircle } from '@mui/icons-material';
 

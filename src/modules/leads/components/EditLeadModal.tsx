@@ -13,7 +13,7 @@ import {
 import type { SelectChangeEvent } from '@mui/material';
 import { addFollowUp } from '../../../services/db-service';
 import type { Lead, LeadStatus } from '../../../services/db-service';
-import { useNotification } from '../../../modules/notifications/NotificationProvider';
+import { useNotification } from '../../notifications/useNotification';
 
 interface EditLeadModalProps {
     open: boolean;

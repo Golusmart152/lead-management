@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material';
 import type { FollowUp } from '../../../services/db-service';
-import { useNotification } from '../../../modules/notifications/NotificationProvider';
+import { useNotification } from '../../notifications/useNotification';
 
 interface EditFollowUpModalProps {
     open: boolean;

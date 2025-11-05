@@ -2,17 +2,17 @@
 import React from 'react';
 import { Typography, Box } from '@mui/material';
 
-const SettingsPage: React.FC = () => {
+const ReportsPage: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Settings
+        Reports
       </Typography>
       <Typography variant="body1">
-        This is the settings page.
+        This is where you can view and generate reports.
       </Typography>
     </Box>
   );
 };
 
-export default SettingsPage;
+export default ReportsPage;

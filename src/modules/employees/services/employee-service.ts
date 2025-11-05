@@ -14,6 +14,7 @@ import {
 import { generateUUID } from "../../../utils/idGenerator";
 import { generateVisibleId } from "../../../services/id-service";
 import type { Employee } from '../types';
+import { addLog } from "../../logs/services/log-service";
 
 const employeesCollection = collection(db, "employees");
 
@@ -35,6 +36,11 @@ export const addEmployee = async (employee: Omit<Employee, 'id' | 'uuid' | 'visi
         visibleId: await generateVisibleId('E', 'employees')
     }
     const docRef = await addDoc(employeesCollection, newEmployee);
+    addLog({
+        action: "create",
+        module: "employees",
+        details: `Created new employee: ${employee.name}`,
+    });
     return { id: docRef.id, ...newEmployee } as Employee;
 };
 
@@ -44,9 +50,19 @@ export const updateEmployee = async (
 ): Promise<void> => {
     const docRef = doc(db, "employees", id);
     await updateDoc(docRef, updates);
+    addLog({
+        action: "update",
+        module: "employees",
+        details: `Updated employee: ${updates.name}`,
+    });
 };
 
-export const deleteEmployee = async (id: string): Promise<void> => {
+export const deleteEmployee = async (id: string, employeeName: string): Promise<void> => {
     const docRef = doc(db, "employees", id);
     await deleteDoc(docRef);
+    addLog({
+        action: "delete",
+        module: "employees",
+        details: `Deleted employee: ${employeeName}`,
+    });
 };

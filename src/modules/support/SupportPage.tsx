@@ -2,17 +2,17 @@
 import React from 'react';
 import { Typography, Box } from '@mui/material';
 
-const ProfilePage: React.FC = () => {
+const SupportPage: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Profile
+        Support
       </Typography>
       <Typography variant="body1">
-        This is the profile page.
+        Get help and support here.
       </Typography>
     </Box>
   );
 };
 
-export default ProfilePage;
+export default SupportPage;

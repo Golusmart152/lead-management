@@ -4,7 +4,6 @@ import { useParams, Link } from 'react-router-dom';
 import {
     Box,
     Typography,
-    Paper,
     Button,
     Grid,
     Chip,
@@ -106,30 +105,16 @@ const EmployeeDetailPage: React.FC = () => {
 
                             <DetailItem>
                                 <BusinessCenterOutlined />
-                                <Typography><strong>Product/Service:</strong> {employee.productOrService}</Typography>
+                                <Typography><strong>Role:</strong> {employee.role.name}</Typography>
                             </DetailItem>
 
                             <Box sx={{ mb: 3 }}>
                                 <DetailItem>
                                     <GroupOutlined />
-                                    <Typography><strong>Roles:</strong></Typography>
+                                    <Typography><strong>Department:</strong></Typography>
                                 </DetailItem>
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, pl: 4 }}>
-                                    {employee.roles.map((role, index) => (
-                                        <Chip key={index} label={role} color="primary" variant="outlined" />
-                                    ))}
-                                </Box>
-                            </Box>
-
-                            <Box>
-                                <DetailItem>
-                                    <GroupOutlined />
-                                    <Typography><strong>Departments:</strong></Typography>
-                                </DetailItem>
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, pl: 4 }}>
-                                    {employee.departments.map((department, index) => (
-                                        <Chip key={index} label={department} color="secondary" variant="outlined" />
-                                    ))}
+                                    <Chip label={employee.department.name} color="primary" variant="outlined" />
                                 </Box>
                             </Box>
                         </Grid>

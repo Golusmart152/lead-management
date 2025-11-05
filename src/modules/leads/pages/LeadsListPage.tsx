@@ -28,7 +28,7 @@ import ScheduledTasksPage from './ScheduledTasksPage';
 import { Edit, Delete, AddComment } from '@mui/icons-material';
 
 const modalStyle = {
-  position: 'absolute' as 'absolute',
+  position: 'absolute' as const,
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',

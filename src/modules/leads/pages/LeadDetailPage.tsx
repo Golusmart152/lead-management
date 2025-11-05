@@ -9,10 +9,9 @@ import {
     Chip
 } from '@mui/material';
 import { ArrowBack as ArrowBackIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import type { Lead } from '../../../services/db-service';
-import { getLead, updateLead, deleteLead } from '../../../services/db-service';
-import EditLeadModal from '../components/EditLeadModal';
-import FollowUpSection from '../components/FollowUpSection';
+import type { Lead } from '../types';
+import { getLead, updateLead, deleteLead } from '../services/lead-service';
+import LeadForm from '../components/LeadForm';
 
 const LeadDetailPage: React.FC = () => {
     const { leadId } = useParams<{ leadId: string }>();
@@ -67,21 +66,10 @@ const LeadDetailPage: React.FC = () => {
                             {lead.name}
                         </Typography>
                         <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 2 }}>
-                            {lead.company}
+                            {lead.email}
                         </Typography>
                     </Box>
                     <Chip label={lead.status} color={getStatusChipColor(lead.status)} sx={{ fontSize: '1rem', fontWeight: 'bold' }} />
-                </Box>
-
-                <Box display="flex" justifyContent="space-between" mt={2}>
-                    <Box>
-                        <Typography variant="body2" color="text.secondary">Email</Typography>
-                        <Typography variant="body1">{lead.email}</Typography>
-                    </Box>
-                    <Box>
-                        <Typography variant="body2" color="text.secondary">Phone</Typography>
-                        <Typography variant="body1">{lead.phone}</Typography>
-                    </Box>
                 </Box>
 
                 <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
@@ -90,14 +78,12 @@ const LeadDetailPage: React.FC = () => {
                 </Box>
             </Paper>
             
-            {leadId && <FollowUpSection leadId={leadId} />}
-
             {lead && (
-                <EditLeadModal 
+                <LeadForm 
                     open={isEditModalOpen} 
                     onClose={() => setIsEditModalOpen(false)} 
                     lead={lead} 
-                    onUpdate={handleUpdateLead} 
+                    onSubmit={handleUpdateLead} 
                 />
             )}
         </Box>
