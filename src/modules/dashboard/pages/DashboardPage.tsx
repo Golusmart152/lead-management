@@ -1,129 +1,235 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import {
-    Container,
-    Box,
-    Paper,
-    Typography,
-    Card,
-    CardContent,
-    Icon
-} from '@mui/material';
-import { 
-    BarChart, 
-    Bar, 
-    XAxis, 
-    YAxis, 
-    CartesianGrid, 
-    Tooltip, 
-    Legend, 
-    ResponsiveContainer,
-    LineChart,
-    Line 
-} from 'recharts';
-import { 
-    People, 
-    AttachMoney, 
-    ShowChart, 
-    Leaderboard 
-} from '@mui/icons-material';
+  Search,
+  Plus,
+  MoreVertical,
+  Users,
+  Target,
+  TrendingUp,
+  ArrowUpRight,
+  Bell,
+  Settings
+} from 'lucide-react';
+import { DashboardCard } from '../components/DashboardCard';
+import { LeadCard } from '../components/LeadCard';
+import { ToggleButtons } from '../components/ToggleButtons';
+import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
+import { Badge } from '../../../components/ui/badge';
 
-const salesData = [
-    { name: 'Jan', sales: 4000 },
-    { name: 'Feb', sales: 3000 },
-    { name: 'Mar', sales: 5000 },
-    { name: 'Apr', sales: 4500 },
-    { name: 'May', sales: 6000 },
-    { name: 'Jun', sales: 5500 },
+// Mock data for demonstration - keeping only essential leads
+const mockLeads = [
+  {
+    id: '1',
+    name: 'John Smith',
+    company: 'Tech Solutions Inc',
+    email: 'john@techsolutions.com',
+    phone: '+1 (555) 123-4567',
+    value: 25000,
+    status: 'hot' as const,
+    source: 'Website',
+    location: 'San Francisco, CA',
+    lastContact: '2 hours ago'
+  },
+  {
+    id: '2',
+    name: 'Sarah Johnson',
+    company: 'Design Studio Co',
+    email: 'sarah@designstudio.com',
+    phone: '+1 (555) 987-6543',
+    value: 18000,
+    status: 'qualified' as const,
+    source: 'Referral',
+    location: 'New York, NY',
+    lastContact: '1 day ago'
+  }
 ];
 
-const leadsData = [
-    { name: 'Week 1', leads: 20 },
-    { name: 'Week 2', leads: 35 },
-    { name: 'Week 3', leads: 25 },
-    { name: 'Week 4', leads: 40 },
-];
-
-interface StatCardProps {
-    title: string;
-    value: string;
-    icon: React.ElementType;
-    color: string;
+interface DashboardStats {
+  totalLeads: number;
+  conversionRate: string;
+  avgDealSize: string;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color }) => (
-    <Card sx={{ 
-        background: `linear-gradient(45deg, ${color} 30%, ${color} 90%)`,
-        color: 'white',
-        boxShadow: '0 3px 5px 2px rgba(0,0,0,0.1)',
-        borderRadius: '12px',
-        height: '100%'
-    }}>
-        <CardContent sx={{ textAlign: 'center' }}>
-            <Icon component={icon} sx={{ fontSize: 40, mb: 1 }} />
-            <Typography variant="h6" component="div">
-                {title}
-            </Typography>
-            <Typography variant="h4">
-                {value}
-            </Typography>
-        </CardContent>
-    </Card>
-);
-
 const DashboardPage: React.FC = () => {
-    return (
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 3 }}>
-                <StatCard title="Total Customers" value="1,234" icon={People} color="#673ab7" />
-                <StatCard title="Monthly Revenue" value="$12,345" icon={AttachMoney} color="#4caf50" />
-                <StatCard title="Conversion Rate" value="15%" icon={ShowChart} color="#ff9800" />
-                <StatCard title="New Leads" value="123" icon={Leaderboard} color="#f44336" />
-            </Box>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' }, gap: 3, mt: 3 }}>
-                <Paper sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 300,
-                    borderRadius: '12px',
-                    boxShadow: '0 3px 5px 2px rgba(0,0,0,0.1)'
-                }}>
-                    <Typography variant="h6" gutterBottom>Sales Overview</Typography>
-                    <ResponsiveContainer>
-                        <BarChart data={salesData}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Bar dataKey="sales" fill="#8884d8" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </Paper>
-                <Paper sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 300,
-                    borderRadius: '12px',
-                    boxShadow: '0 3px 5px 2px rgba(0,0,0,0.1)'
-                }}>
-                    <Typography variant="h6" gutterBottom>Recent Leads</Typography>
-                    <ResponsiveContainer>
-                        <LineChart data={leadsData}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Line type="monotone" dataKey="leads" stroke="#82ca9d" />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </Paper>
-            </Box>
-        </Container>
-    );
+  const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Calculate dashboard statistics
+  const stats: DashboardStats = React.useMemo(() => {
+    const totalLeads = mockLeads.length;
+    const totalValue = mockLeads.reduce((sum, lead) => sum + lead.value, 0);
+    const avgDealSize = totalLeads > 0 ? `$${(totalValue / totalLeads).toLocaleString()}` : '$0';
+    const conversionRate = totalLeads > 0 ? '18.5%' : '0%';
+
+    return {
+      totalLeads,
+      conversionRate,
+      avgDealSize
+    };
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-background p-8">
+      <div className="max-w-[1600px] mx-auto space-y-16">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Lead Management Dashboard</h1>
+            <p className="text-muted-foreground mt-1">Manage your leads efficiently</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm">
+              <Bell className="h-4 w-4 mr-2" />
+              Notifications
+            </Button>
+            <Button variant="outline" size="sm">
+              <Settings className="h-4 w-4 mr-2" />
+              Settings
+            </Button>
+            <Button size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              New Lead
+            </Button>
+          </div>
+        </div>
+
+        {/* Key Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <DashboardCard className="p-4" hover={false}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Leads</p>
+                <p className="text-2xl font-bold">{stats.totalLeads}</p>
+                <Badge variant="outline" className="text-green-600 border-green-200 mt-1">
+                  <ArrowUpRight className="h-3 w-3 mr-1" />
+                  +12%
+                </Badge>
+              </div>
+              <Users className="h-8 w-8 text-blue-500" />
+            </div>
+          </DashboardCard>
+
+          <DashboardCard className="p-4" hover={false}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Conversion Rate</p>
+                <p className="text-2xl font-bold">{stats.conversionRate}</p>
+                <Badge variant="outline" className="text-green-600 border-green-200 mt-1">
+                  <ArrowUpRight className="h-3 w-3 mr-1" />
+                  +2.1%
+                </Badge>
+              </div>
+              <TrendingUp className="h-8 w-8 text-purple-500" />
+            </div>
+          </DashboardCard>
+
+          <DashboardCard className="p-4" hover={false}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Avg Deal Size</p>
+                <p className="text-2xl font-bold">{stats.avgDealSize}</p>
+                <Badge variant="outline" className="text-green-600 border-green-200 mt-1">
+                  <ArrowUpRight className="h-3 w-3 mr-1" />
+                  +5.3%
+                </Badge>
+              </div>
+              <Target className="h-8 w-8 text-green-500" />
+            </div>
+          </DashboardCard>
+        </div>
+
+        {/* Main Content Layout */}
+        <div className="flex gap-8 overflow-x-auto">
+          {/* Left Column - Filters and Search */}
+          <div className="flex-shrink-0 w-[320px] space-y-16">
+            {/* Filters Card */}
+            <DashboardCard>
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Filters</h3>
+
+                <div>
+                  <p className="text-sm font-medium mb-2">Lead Status</p>
+                  <ToggleButtons
+                    type="multiple"
+                    values={['hot', 'warm', 'cold', 'qualified']}
+                    selectedValues={selectedStatus}
+                    onValueChange={(value) => setSelectedStatus(value as string[])}
+                  />
+                </div>
+              </div>
+            </DashboardCard>
+
+            {/* Search and Quick Actions */}
+            <DashboardCard>
+              <div className="space-y-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search leads..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <Button className="w-full" size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add New Lead
+                </Button>
+              </div>
+            </DashboardCard>
+          </div>
+
+          {/* Right Column - Leads Display */}
+          <div className="flex-1 space-y-16">
+            {/* Hot Leads */}
+            <DashboardCard>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-lg">Hot Leads</h3>
+                  <Button variant="ghost" size="sm">
+                    View All
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 gap-6">
+                  {mockLeads.filter(lead => lead.status === 'hot').map((lead) => (
+                    <LeadCard
+                      key={lead.id}
+                      lead={lead}
+                      onContact={() => console.log('Contact lead')}
+                      onViewDetails={() => console.log('View lead details')}
+                    />
+                  ))}
+                </div>
+              </div>
+            </DashboardCard>
+
+            {/* All Leads */}
+            <DashboardCard>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-lg">All Leads</h3>
+                  <Button variant="ghost" size="sm">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 gap-6">
+                  {mockLeads.map((lead) => (
+                    <LeadCard
+                      key={lead.id}
+                      lead={lead}
+                      onContact={() => console.log('Contact lead')}
+                      onViewDetails={() => console.log('View lead details')}
+                    />
+                  ))}
+                </div>
+              </div>
+            </DashboardCard>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default DashboardPage;

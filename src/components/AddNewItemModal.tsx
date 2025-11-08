@@ -1,12 +1,14 @@
-
 import React, { useState } from 'react';
 import {
-    Modal,
-    Box,
-    Typography,
-    TextField,
-    Button
-} from '@mui/material';
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from './ui/dialog';
+import { Input } from './ui/input';
+import { Button } from './ui/button';
 
 interface AddNewItemModalProps {
     open: boolean;
@@ -24,34 +26,38 @@ const AddNewItemModal: React.FC<AddNewItemModalProps> = ({ open, onClose, onSave
     };
 
     return (
-        <Modal open={open} onClose={onClose}>
-            <Box sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: 400,
-                bgcolor: 'background.paper',
-                borderRadius: '12px',
-                boxShadow: 24,
-                p: 4,
-            }}>
-                <Typography variant="h6" component="h2">Add New {itemName}</Typography>
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    label={`${itemName} Name`}
-                    name="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                />
-                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                    <Button onClick={onClose}>Close</Button>
-                    <Button onClick={handleSave} variant="contained">Create</Button>
-                </Box>
-            </Box>
-        </Modal>
+        <Dialog open={open} onOpenChange={onClose}>
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>Add New {itemName}</DialogTitle>
+                    <DialogDescription>
+                        Enter the name for your new {itemName.toLowerCase()}.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <label htmlFor="name" className="text-right">
+                            Name
+                        </label>
+                        <Input
+                            id="name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="col-span-3"
+                            placeholder={`${itemName} Name`}
+                        />
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button type="button" variant="outline" onClick={onClose}>
+                        Close
+                    </Button>
+                    <Button onClick={handleSave}>
+                        Create
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 

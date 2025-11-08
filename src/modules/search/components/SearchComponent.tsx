@@ -1,22 +1,13 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-    Box, 
-    TextField, 
-    Paper, 
-    List, 
-    ListItem, 
-    ListItemText, 
-    Typography, 
-    InputAdornment, 
-    ListItemButton 
-} from '@mui/material';
-import { Search as SearchIcon } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { debounce } from 'lodash';
 import { search } from '../services/search-service';
 import type { SearchResult } from '../types';
+import { Search } from 'lucide-react';
+import { Input } from '../../../components/ui/input';
+import { Card, CardContent } from '../../../components/ui/card';
 
 const SearchComponent: React.FC = () => {
     const [query, setQuery] = useState('');
@@ -24,7 +15,7 @@ const SearchComponent: React.FC = () => {
     const [isFocused, setIsFocused] = useState(false);
     const navigate = useNavigate();
 
-    const handleSearch = useMemo(() => 
+    const handleSearch = useMemo(() =>
         debounce(async (searchQuery: string) => {
             if (searchQuery) {
                 const searchResults = await search(searchQuery);
@@ -32,7 +23,7 @@ const SearchComponent: React.FC = () => {
             } else {
                 setResults([]);
             }
-        }, 300), 
+        }, 300),
     []);
 
     useEffect(() => {
@@ -63,25 +54,19 @@ const SearchComponent: React.FC = () => {
     }, {} as Record<string, SearchResult[]>);
 
     return (
-        <Box sx={{ position: 'relative', width: '100%' }}>
-            <TextField
-                variant="outlined"
-                size="small"
-                fullWidth
-                placeholder="Search..."
-                value={query}
-                onChange={handleChange}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setTimeout(() => setIsFocused(false), 200)} // Delay to allow click on results
-                InputProps={{
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <SearchIcon />
-                        </InputAdornment>
-                    ),
-                    sx: { borderRadius: 2 },
-                }}
-            />
+        <div className="relative w-full">
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                    placeholder="Search..."
+                    value={query}
+                    onChange={handleChange}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+                    className="pl-10"
+                />
+            </div>
+            
             <AnimatePresence>
                 {isFocused && query && (
                     <motion.div
@@ -89,45 +74,40 @@ const SearchComponent: React.FC = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        style={{ 
-                            position: 'absolute', 
-                            top: '110%', 
-                            left: 0, 
-                            right: 0, 
-                            zIndex: 10 
-                        }}
+                        className="absolute top-full left-0 right-0 z-50 mt-2"
                     >
-                        <Paper elevation={4} sx={{ borderRadius: 2, overflow: 'hidden' }}>
-                            {Object.keys(groupedResults).length > 0 ? (
-                                <List>
-                                    {Object.entries(groupedResults).map(([module, items]) => (
-                                        <React.Fragment key={module}>
-                                            <ListItem sx={{ bgcolor: 'grey[100]' }}>
-                                                <Typography variant="subtitle2" color="textSecondary">
+                        <Card className="rounded-lg shadow-lg border">
+                            <CardContent className="p-0">
+                                {Object.keys(groupedResults).length > 0 ? (
+                                    <div className="max-h-96 overflow-y-auto">
+                                        {Object.entries(groupedResults).map(([module, items]) => (
+                                            <React.Fragment key={module}>
+                                                <div className="px-4 py-2 bg-muted/50 text-sm font-medium border-b">
                                                     {module}
-                                                </Typography>
-                                            </ListItem>
-                                            {items.map(item => (
-                                                <ListItemButton 
-                                                    key={item.id} 
-                                                    onClick={() => handleResultClick(item.url)}
-                                                >
-                                                    <ListItemText primary={item.title} />
-                                                </ListItemButton>
-                                            ))}
-                                        </React.Fragment>
-                                    ))}
-                                </List>
-                            ) : (
-                                <Box sx={{ p: 2, textAlign: 'center' }}>
-                                    <Typography>No results found</Typography>
-                                </Box>
-                            )}
-                        </Paper>
+                                                </div>
+                                                {items.map(item => (
+                                                    <button
+                                                        key={item.id}
+                                                        className="w-full text-left px-4 py-2 hover:bg-muted transition-colors duration-200 border-b last:border-b-0"
+                                                        onClick={() => handleResultClick(item.url)}
+                                                    >
+                                                        <span className="font-medium">{item.title}</span>
+                                                    </button>
+                                                ))}
+                                            </React.Fragment>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="px-4 py-4 text-center text-muted-foreground">
+                                        No results found
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
                     </motion.div>
                 )}
             </AnimatePresence>
-        </Box>
+        </div>
     );
 };
 

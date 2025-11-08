@@ -1,12 +1,10 @@
-
 import React from 'react';
-import { Typography } from '@mui/material';
 
 const SettingsPage: React.FC = () => {
     return (
-        <div>
-            <Typography variant="h4">Settings Page</Typography>
-            <Typography variant="body1">This page will contain application settings.</Typography>
+        <div className="space-y-6">
+            <h1 className="text-3xl font-bold">Settings Page</h1>
+            <p className="text-lg text-muted-foreground">This page will contain application settings.</p>
         </div>
     );
 };

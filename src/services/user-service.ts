@@ -12,13 +12,13 @@ export const createUserProfile = async (uid: string, data: Partial<UserProfile>)
     });
 };
 
-export const getUserProfile = async (uid: string): Promise<UserProfile> => {
+export const getUserProfile = async (uid: string): Promise<UserProfile | null> => {
     const docRef = doc(db, userProfilesCollection, uid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
         return docSnap.data() as UserProfile;
     } else {
-        throw new Error('No such user profile!');
+        return null;
     }
 };
 

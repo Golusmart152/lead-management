@@ -1,13 +1,13 @@
-
 import React from 'react';
 import {
     Dialog,
-    DialogActions,
     DialogContent,
-    DialogContentText,
+    DialogHeader,
     DialogTitle,
-    Button,
-} from '@mui/material';
+    DialogDescription,
+    DialogFooter,
+} from './ui/dialog';
+import { Button } from './ui/button';
 
 interface ConfirmationDialogProps {
     open: boolean;
@@ -19,26 +19,23 @@ interface ConfirmationDialogProps {
 
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({ open, onClose, onConfirm, title, description }) => {
     return (
-        <Dialog
-            open={open}
-            onClose={onClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-        >
-            <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
+        <Dialog open={open} onOpenChange={onClose}>
             <DialogContent>
-                <DialogContentText id="alert-dialog-description">
-                    {description}
-                </DialogContentText>
+                <DialogHeader>
+                    <DialogTitle>{title}</DialogTitle>
+                    <DialogDescription>
+                        {description}
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                    <Button variant="outline" onClick={onClose}>
+                        Cancel
+                    </Button>
+                    <Button onClick={onConfirm} autoFocus>
+                        Confirm
+                    </Button>
+                </DialogFooter>
             </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose} color="secondary">
-                    Cancel
-                </Button>
-                <Button onClick={onConfirm} color="primary" autoFocus>
-                    Confirm
-                </Button>
-            </DialogActions>
         </Dialog>
     );
 };

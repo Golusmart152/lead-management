@@ -1,6 +1,16 @@
-
 import React from 'react';
-import { Modal, Box, Typography, Select, MenuItem, Button, FormControl, InputLabel } from '@mui/material';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../../../components/ui/dialog';
+import { Button } from '../../../components/ui/button';
+import { Label } from '../../../components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
+import { Card, CardContent } from '../../../components/ui/card';
 
 interface EditUserModalProps {
   open: boolean;
@@ -13,18 +23,6 @@ interface EditUserModalProps {
   onSave: (userId: string, newRole: string) => void;
 }
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  borderRadius: 2,
-  boxShadow: 24,
-  p: 4,
-};
-
 const EditUserModal: React.FC<EditUserModalProps> = ({ open, onClose, user, onSave }) => {
   const [role, setRole] = React.useState(user?.role || '');
 
@@ -35,39 +33,62 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ open, onClose, user, onSa
   }, [user]);
 
   const handleSave = () => {
-    if (user) {
+    if (user && role) {
       onSave(user.id, role);
     }
   };
 
+  if (!user) return null;
+
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box sx={style}>
-        <Typography variant="h6" component="h2">Edit User Role</Typography>
-        {user && (
-          <Box mt={2}>
-            <Typography variant="subtitle1">User: {user.email}</Typography>
-            <FormControl fullWidth margin="normal">
-              <InputLabel id="role-select-label">Role</InputLabel>
-              <Select
-                labelId="role-select-label"
-                value={role}
-                label="Role"
-                onChange={(e) => setRole(e.target.value)}
-              >
-                <MenuItem value="Super Admin">Super Admin</MenuItem>
-                <MenuItem value="Admin">Admin</MenuItem>
-                <MenuItem value="User">User</MenuItem>
-              </Select>
-            </FormControl>
-            <Box mt={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Button onClick={onClose}>Cancel</Button>
-              <Button onClick={handleSave} variant="contained" sx={{ ml: 1 }}>Save</Button>
-            </Box>
-          </Box>
-        )}
-      </Box>
-    </Modal>
+    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit User Role</DialogTitle>
+          <DialogDescription>
+            Update the role for {user.email}
+          </DialogDescription>
+        </DialogHeader>
+        
+        <Card>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="user-email">User Email</Label>
+                <div className="p-3 bg-muted/50 rounded-md text-sm">
+                  {user.email}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="role-select">Role</Label>
+                <Select value={role} onValueChange={setRole}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Super Admin">Super Admin</SelectItem>
+                    <SelectItem value="Admin">Admin</SelectItem>
+                    <SelectItem value="Manager">Manager</SelectItem>
+                    <SelectItem value="Employee">Employee</SelectItem>
+                    <SelectItem value="User">User</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={handleSave} disabled={!role}>
+            Save Changes
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

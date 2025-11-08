@@ -1,22 +1,14 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-    Box,
-    Button,
-    CircularProgress,
-    Paper,
-    Typography,
-    Alert,
-    IconButton,
-    Tooltip,
-} from '@mui/material';
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Refresh as RefreshIcon } from '@mui/icons-material';
-import { DataGrid, type GridColDef, type GridRenderCellParams } from '@mui/x-data-grid';
 import { motion } from 'framer-motion';
 import type { Employee } from '../types';
 import { getEmployees, addEmployee, updateEmployee, deleteEmployee } from '../services/employee-service';
 import EmployeeForm from '../components/EmployeeForm';
 import ConfirmationDialog from '../../../components/ConfirmationDialog';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Button } from '../../../components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';
+import { Plus, Edit, Trash2, RefreshCw, Users } from 'lucide-react';
 
 const EmployeeList: React.FC = () => {
     const [employees, setEmployees] = useState<Employee[]>([]);
@@ -96,125 +88,112 @@ const EmployeeList: React.FC = () => {
         }
     };
 
-    const columns: GridColDef<Employee>[] = [
-        { field: 'visibleId', headerName: 'ID', width: 100 },
-        { field: 'name', headerName: 'Name', width: 200 },
-        { field: 'email', headerName: 'Email', width: 250 },
-        { field: 'phone', headerName: 'Phone', width: 150 },
-        {
-            field: 'role',
-            headerName: 'Role',
-            width: 150,
-            valueGetter: (_, row) => row.role.name,
-        },
-        {
-            field: 'department',
-            headerName: 'Department',
-            width: 180,
-            valueGetter: (_, row) => row.department.name,
-        },
-        {
-            field: 'actions',
-            headerName: 'Actions',
-            width: 150,
-            sortable: false,
-            renderCell: (params: GridRenderCellParams) => (
-                <Box>
-                    <Tooltip title="Edit">
-                        <IconButton onClick={() => handleEditClick(params.row as Employee)} color="primary">
-                            <EditIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete">
-                        <IconButton onClick={() => handleDeleteClick(params.row as Employee)} color="secondary">
-                            <DeleteIcon />
-                        </IconButton>
-                    </Tooltip>
-                </Box>
-            ),
-        },
-    ];
-
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-            <Paper elevation={3} sx={{ p: 4, borderRadius: 4, bgcolor: 'background.paper' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                    <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                        Employee Management
-                    </Typography>
-                    <Box>
-                        <Tooltip title="Refresh Data">
-                            <IconButton onClick={fetchEmployees} color="primary">
-                                <RefreshIcon />
-                            </IconButton>
-                        </Tooltip>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            startIcon={<AddIcon />}
-                            onClick={handleAddClick}
-                            sx={{ ml: 2, borderRadius: 2, boxShadow: '0 3px 5px 2px rgba(0, 105, 255, .3)' }}
-                        >
-                            Add Employee
-                        </Button>
-                    </Box>
-                </Box>
+            <Card>
+                <CardHeader>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <CardTitle className="text-2xl font-bold flex items-center gap-3">
+                                <Users className="h-6 w-6 text-primary" />
+                                Employee Management
+                            </CardTitle>
+                            <CardDescription>
+                                Manage your organization's employee records and information
+                            </CardDescription>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Button variant="outline" size="sm" onClick={fetchEmployees}>
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                                Refresh
+                            </Button>
+                            <Button onClick={handleAddClick}>
+                                <Plus className="h-4 w-4 mr-2" />
+                                Add Employee
+                            </Button>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    {error && (
+                        <div className="mb-4 p-3 bg-destructive/15 border border-destructive/20 rounded-md text-destructive">
+                            {error}
+                        </div>
+                    )}
 
-                {error && (
-                    <Alert severity="error" sx={{ mb: 2 }}>
-                        {error}
-                    </Alert>
-                )}
+                    {loading ? (
+                        <div className="flex justify-center items-center py-12">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        </div>
+                    ) : (
+                        <div className="rounded-md border">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>ID</TableHead>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead>Email</TableHead>
+                                        <TableHead>Phone</TableHead>
+                                        <TableHead>Role</TableHead>
+                                        <TableHead>Department</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {employees.map((employee) => (
+                                        <TableRow key={employee.id}>
+                                            <TableCell className="font-mono text-sm">
+                                                {employee.visibleId}
+                                            </TableCell>
+                                            <TableCell className="font-medium">
+                                                {employee.name}
+                                            </TableCell>
+                                            <TableCell>{employee.email}</TableCell>
+                                            <TableCell>{employee.phone || '-'}</TableCell>
+                                            <TableCell>{employee.role.name}</TableCell>
+                                            <TableCell>{employee.department.name}</TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleEditClick(employee)}
+                                                    >
+                                                        <Edit className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleDeleteClick(employee)}
+                                                        className="text-destructive hover:text-destructive"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
 
-                {loading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 400 }}>
-                        <CircularProgress />
-                    </Box>
-                ) : (
-                    <Box sx={{ height: 600, width: '100%' }}>
-                        <DataGrid
-                            rows={employees}
-                            columns={columns}
-                            initialState={{
-                                pagination: {
-                                    paginationModel: { pageSize: 10, page: 0 }
-                                }
-                            }}
-                            pageSizeOptions={[5, 10, 25]}
-                            rowHeight={60}
-                            sx={{
-                                '& .MuiDataGrid-columnHeaders': {
-                                    backgroundColor: 'primary.light',
-                                    color: 'primary.contrastText',
-                                    fontSize: '1rem',
-                                },
-                                '& .MuiDataGrid-cell': {
-                                    fontSize: '0.95rem',
-                                },
-                                '& .MuiDataGrid-footerContainer': {
-                                    backgroundColor: 'primary.light',
-                                    color: 'primary.contrastText',
-                                },
-                            }}
-                        />
-                    </Box>
-                )}
+            <EmployeeForm
+                open={isFormOpen}
+                onClose={handleFormClose}
+                onSubmit={handleFormSubmit}
+                employee={selectedEmployee}
+            />
 
-                <EmployeeForm
-                    open={isFormOpen}
-                    onClose={handleFormClose}
-                    onSubmit={handleFormSubmit}
-                    employee={selectedEmployee}
-                />
-
-                <ConfirmationDialog
-                    open={isConfirmDialogOpen}
-                    onClose={() => setConfirmDialogOpen(false)}
-                    onConfirm={handleDeleteConfirm}
-                    title="Confirm Deletion"
-                    description={`Are you sure you want to delete ${employeeToDelete?.name}? This action cannot be undone.`}
-                />
-            </Paper>
+            <ConfirmationDialog
+                open={isConfirmDialogOpen}
+                onClose={() => setConfirmDialogOpen(false)}
+                onConfirm={handleDeleteConfirm}
+                title="Confirm Deletion"
+                description={`Are you sure you want to delete ${employeeToDelete?.name}? This action cannot be undone.`}
+            />
         </motion.div>
     );
 };

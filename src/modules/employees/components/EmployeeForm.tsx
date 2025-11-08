@@ -1,26 +1,17 @@
 
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller, type SubmitHandler } from 'react-hook-form';
-import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
-    TextField,
-    Box,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    CircularProgress,
-    FormHelperText,
-} from '@mui/material';
 import type { Employee } from '../types';
 import type { Role } from '../../roles/types';
 import type { Department } from '../../departments/types';
 import { getRoles } from '../../roles/services/role-service';
 import { getDepartments } from '../../departments/services/department-service';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
+import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
+import { Label } from '../../../components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
+import { Users } from 'lucide-react';
 
 interface EmployeeFormProps {
     open: boolean;
@@ -119,101 +110,150 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ open, onClose, onSubmit, em
     };
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>{employee ? 'Edit Employee' : 'Add Employee'}</DialogTitle>
-            <form onSubmit={handleSubmit(handleFormSubmit)}>
-                <DialogContent>
-                    {loading ? (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                            <CircularProgress />
-                        </Box>
-                    ) : (
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+        <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
+            <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                        <Users className="h-5 w-5" />
+                        {employee ? 'Edit Employee' : 'Add Employee'}
+                    </DialogTitle>
+                    <DialogDescription>
+                        {employee ? 'Update employee information.' : 'Create a new employee profile.'}
+                    </DialogDescription>
+                </DialogHeader>
+                
+                {loading ? (
+                    <div className="flex justify-center p-4">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    </div>
+                ) : (
+                    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="name">Name *</Label>
                             <Controller
                                 name="name"
                                 control={control}
                                 rules={{ required: 'Name is required' }}
                                 render={({ field }) => (
-                                    <TextField
+                                    <Input
                                         {...field}
-                                        label="Name"
-                                        fullWidth
-                                        error={!!errors.name}
-                                        helperText={errors.name?.message}
+                                        id="name"
+                                        placeholder="Employee name"
+                                        className={errors.name ? 'border-destructive' : ''}
                                     />
                                 )}
                             />
-                            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
+                            {errors.name && (
+                                <p className="text-sm text-destructive">{errors.name.message}</p>
+                            )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="email">Email *</Label>
                                 <Controller
                                     name="email"
                                     control={control}
-                                    rules={{ required: 'Email is required', pattern: { value: /^\S+@\S+$/, message: 'Invalid email address' } }}
+                                    rules={{
+                                        required: 'Email is required',
+                                        pattern: { value: /^\S+@\S+$/, message: 'Invalid email address' }
+                                    }}
                                     render={({ field }) => (
-                                        <TextField
+                                        <Input
                                             {...field}
-                                            label="Email"
-                                            fullWidth
-                                            error={!!errors.email}
-                                            helperText={errors.email?.message}
+                                            id="email"
+                                            type="email"
+                                            placeholder="email@example.com"
+                                            className={errors.email ? 'border-destructive' : ''}
                                         />
                                     )}
                                 />
+                                {errors.email && (
+                                    <p className="text-sm text-destructive">{errors.email.message}</p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="phone">Phone</Label>
                                 <Controller
                                     name="phone"
                                     control={control}
                                     render={({ field }) => (
-                                        <TextField
+                                        <Input
                                             {...field}
-                                            label="Phone"
-                                            fullWidth
-                                            error={!!errors.phone}
-                                            helperText={errors.phone?.message}
+                                            id="phone"
+                                            placeholder="Phone number"
                                         />
                                     )}
                                 />
-                            </Box>
-                            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
-                                <FormControl fullWidth error={!!errors.roleId}>
-                                    <InputLabel>Role</InputLabel>
-                                    <Controller
-                                        name="roleId"
-                                        control={control}
-                                        rules={{ required: 'Role is required' }}
-                                        render={({ field }) => (
-                                            <Select {...field} label="Role">
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="roleId">Role *</Label>
+                                <Controller
+                                    name="roleId"
+                                    control={control}
+                                    rules={{ required: 'Role is required' }}
+                                    render={({ field }) => (
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <SelectTrigger className={errors.roleId ? 'border-destructive' : ''}>
+                                                <SelectValue placeholder="Select role" />
+                                            </SelectTrigger>
+                                            <SelectContent>
                                                 {roles.map((role) => (
-                                                    <MenuItem key={role.id} value={role.id}>{role.name}</MenuItem>
+                                                    <SelectItem key={role.id} value={role.id}>
+                                                        {role.name}
+                                                    </SelectItem>
                                                 ))}
-                                            </Select>
-                                        )}
-                                    />
-                                    {errors.roleId && <FormHelperText>{errors.roleId.message}</FormHelperText>}
-                                </FormControl>
-                                <FormControl fullWidth error={!!errors.departmentId}>
-                                    <InputLabel>Department</InputLabel>
-                                    <Controller
-                                        name="departmentId"
-                                        control={control}
-                                        rules={{ required: 'Department is required' }}
-                                        render={({ field }) => (
-                                            <Select {...field} label="Department">
+                                            </SelectContent>
+                                        </Select>
+                                    )}
+                                />
+                                {errors.roleId && (
+                                    <p className="text-sm text-destructive">{errors.roleId.message}</p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="departmentId">Department *</Label>
+                                <Controller
+                                    name="departmentId"
+                                    control={control}
+                                    rules={{ required: 'Department is required' }}
+                                    render={({ field }) => (
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <SelectTrigger className={errors.departmentId ? 'border-destructive' : ''}>
+                                                <SelectValue placeholder="Select department" />
+                                            </SelectTrigger>
+                                            <SelectContent>
                                                 {departments.map((dept) => (
-                                                    <MenuItem key={dept.id} value={dept.id}>{dept.name}</MenuItem>
+                                                    <SelectItem key={dept.id} value={dept.id}>
+                                                        {dept.name}
+                                                    </SelectItem>
                                                 ))}
-                                            </Select>
-                                        )}
-                                    />
-                                    {errors.departmentId && <FormHelperText>{errors.departmentId.message}</FormHelperText>}
-                                </FormControl>
-                            </Box>
-                        </Box>
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={onClose}>Cancel</Button>
-                    <Button type="submit" variant="contained">{employee ? 'Save' : 'Add'}</Button>
-                </DialogActions>
-            </form>
+                                            </SelectContent>
+                                        </Select>
+                                    )}
+                                />
+                                {errors.departmentId && (
+                                    <p className="text-sm text-destructive">{errors.departmentId.message}</p>
+                                )}
+                            </div>
+                        </div>
+
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={onClose}>
+                                Cancel
+                            </Button>
+                            <Button type="submit">
+                                {employee ? 'Save Changes' : 'Add Employee'}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                )}
+            </DialogContent>
         </Dialog>
     );
 };

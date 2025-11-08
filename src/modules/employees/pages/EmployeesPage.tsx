@@ -1,24 +1,15 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { 
-    Box, 
-    Button, 
-    Typography, 
-    CircularProgress, 
-    TextField, 
-    InputAdornment,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle
-} from '@mui/material';
-import { Add as AddIcon, Search as SearchIcon } from '@mui/icons-material';
 import { getEmployees, addEmployee, updateEmployee, deleteEmployee } from '../services/employee-service';
 import type { Employee } from '../types';
 import EmployeeForm from '../components/EmployeeForm';
 import EmployeesTable from '../components/EmployeesTable';
 import { useNotification } from '../../notifications/useNotification';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
+import { Plus, Search, Users } from 'lucide-react';
 
 const EmployeesPage: React.FC = () => {
     const [employees, setEmployees] = useState<Employee[]>([]);
@@ -90,70 +81,95 @@ const EmployeesPage: React.FC = () => {
         setFormOpen(false);
     };
 
-    const filteredEmployees = useMemo(() => 
-        employees.filter(employee => 
+    const filteredEmployees = useMemo(() =>
+        employees.filter(employee =>
             employee.name.toLowerCase().includes(searchTerm.toLowerCase())
-        ), 
+        ),
         [employees, searchTerm]
     );
 
     return (
-        <Box sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h4" gutterBottom>Employees</Typography>
-                <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={handleAddEmployee}
-                >
+        <div className="container mx-auto p-6 space-y-6">
+            {/* Header */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold flex items-center gap-3">
+                        <Users className="h-8 w-8 text-primary" />
+                        Employees
+                    </h1>
+                    <p className="text-muted-foreground mt-1">Manage your organization's employee records</p>
+                </div>
+                <Button onClick={handleAddEmployee}>
+                    <Plus className="h-4 w-4 mr-2" />
                     Add Employee
                 </Button>
-            </Box>
-            <Box sx={{ mb: 2 }}>
-                <TextField
-                    fullWidth
-                    variant="outlined"
+            </div>
+
+            {/* Search */}
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
                     placeholder="Search employees..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon />
-                            </InputAdornment>
-                        ),
-                    }}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                    className="pl-9"
                 />
-            </Box>
-            {loading ? <CircularProgress /> : (
-                <EmployeesTable 
-                    employees={filteredEmployees} 
-                    onEdit={handleEditEmployee} 
-                    onDelete={handleDeleteConfirmation} 
-                />
+            </div>
+
+            {/* Content */}
+            {loading ? (
+                <div className="flex justify-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+            ) : (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Employee Directory</CardTitle>
+                        <CardDescription>
+                            {filteredEmployees.length} of {employees.length} employees
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <EmployeesTable
+                            employees={filteredEmployees}
+                            onEdit={handleEditEmployee}
+                            onDelete={handleDeleteConfirmation}
+                        />
+                    </CardContent>
+                </Card>
             )}
+
+            {/* Employee Form */}
             <EmployeeForm
                 open={isFormOpen}
                 onClose={() => setFormOpen(false)}
                 onSubmit={handleFormSubmit}
                 employee={editingEmployee}
             />
-            <Dialog
-                open={!!employeeToDelete}
-                onClose={() => setEmployeeToDelete(null)}
-            >
-                <DialogTitle>Delete Employee</DialogTitle>
+
+            {/* Delete Confirmation */}
+            <Dialog open={!!employeeToDelete} onOpenChange={(open) => !open && setEmployeeToDelete(null)}>
                 <DialogContent>
-                    <DialogContentText>
-                        Are you sure you want to delete {employeeToDelete?.name}? This action cannot be undone.
-                    </DialogContentText>
+                    <DialogHeader>
+                        <DialogTitle>Delete Employee</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to delete {employeeToDelete?.name}? This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setEmployeeToDelete(null)}>
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleDeleteEmployee}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            Delete
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setEmployeeToDelete(null)}>Cancel</Button>
-                    <Button onClick={handleDeleteEmployee} color="error">Delete</Button>
-                </DialogActions>
             </Dialog>
-        </Box>
+        </div>
     );
 };
 

@@ -1,20 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import {
-    Modal,
-    Box,
-    Typography,
-    TextField,
-    Button,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem
-} from '@mui/material';
-import type { SelectChangeEvent } from '@mui/material';
 import { addFollowUp, updateLead } from '../../../services/db-service';
 import type { Lead, LeadStatus, FollowUp } from '../../../services/db-service';
 import { useNotification } from '../../notifications/useNotification';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '../../../components/ui/dialog';
+import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
+import { Label } from '../../../components/ui/label';
+import { Textarea } from '../../../components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
 
 interface FollowUpModalProps {
     open: boolean;
@@ -53,11 +47,6 @@ const FollowUpModal: React.FC<FollowUpModalProps> = ({ open, onClose, lead, onFo
         }
     }, [open, lead]);
 
-    const handleStatusChange = (e: SelectChangeEvent) => {
-        const newStatus = e.target.value as LeadStatus;
-        setStatus(newStatus);
-    }
-
     const handleSave = async () => {
         if (!lead || !status || !followUpDate || !followUpTime) {
             return;
@@ -86,78 +75,71 @@ const FollowUpModal: React.FC<FollowUpModalProps> = ({ open, onClose, lead, onFo
     };
 
     return (
-        <Modal open={open} onClose={onClose}>
-            <Box sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: 400,
-                bgcolor: 'background.paper',
-                borderRadius: '12px',
-                boxShadow: 24,
-                p: 4,
-            }}>
-                <Typography variant="h6" component="h2">Add Follow-up</Typography>
-                {lead && (
-                    <>
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            label="Follow-up Date"
-                            name="date"
-                            type="date"
-                            value={followUpDate}
-                            onChange={(e) => setFollowUpDate(e.target.value)}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            label="Follow-up Time"
-                            name="time"
-                            type="time"
-                            value={followUpTime}
-                            onChange={(e) => setFollowUpTime(e.target.value)}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
-                        <TextField
-                            margin="normal"
-                            fullWidth
-                            label="Notes"
-                            name="notes"
+        <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
+            <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                    <DialogTitle>Add Follow-up</DialogTitle>
+                    <DialogDescription>
+                        Schedule a follow-up for {lead?.name || 'this lead'}
+                    </DialogDescription>
+                </DialogHeader>
+                
+                <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="followUpDate">Follow-up Date</Label>
+                            <Input
+                                id="followUpDate"
+                                type="date"
+                                value={followUpDate}
+                                onChange={(e) => setFollowUpDate(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="followUpTime">Follow-up Time</Label>
+                            <Input
+                                id="followUpTime"
+                                type="time"
+                                value={followUpTime}
+                                onChange={(e) => setFollowUpTime(e.target.value)}
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="notes">Notes</Label>
+                        <Textarea
+                            id="notes"
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
-                            multiline
+                            placeholder="Add notes about this follow-up..."
                             rows={4}
                         />
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel>Status</InputLabel>
-                            <Select
-                                name="status"
-                                value={status}
-                                label="Status"
-                                onChange={handleStatusChange}
-                            >
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="status">Lead Status</Label>
+                        <Select value={status} onValueChange={(value) => setStatus(value as LeadStatus)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
                                 {leadStatuses.map(s => (
-                                    <MenuItem key={s} value={s}>{s}</MenuItem>
+                                    <SelectItem key={s} value={s}>{s}</SelectItem>
                                 ))}
-                            </Select>
-                        </FormControl>
-                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                            <Button onClick={onClose}>Close</Button>
-                            <Button onClick={handleSave} variant="contained">Save</Button>
-                        </Box>
-                    </>
-                )}
-            </Box>
-        </Modal>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+
+                <DialogFooter>
+                    <Button variant="outline" onClick={onClose}>Cancel</Button>
+                    <Button onClick={handleSave}>Save Follow-up</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 
