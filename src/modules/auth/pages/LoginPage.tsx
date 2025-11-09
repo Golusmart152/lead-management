@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { Mail, Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
 import { Input } from '../../../components/ui/input';
+import { Button } from '../../../components/ui/button';
 import { Alert, AlertDescription } from '../../../components/ui/alert';
 import { useToast } from '../../../hooks/use-toast';
 
@@ -42,8 +43,8 @@ const LoginPage: React.FC = () => {
         description: "You have been successfully logged in.",
         variant: "default",
       });
-    } catch (err: any) {
-      if (err.message.includes('license')) {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message.includes('license')) {
         setError('root', {
           type: 'manual',
           message: 'Your license is invalid or expired. Please contact support.',
@@ -80,7 +81,7 @@ const LoginPage: React.FC = () => {
                 id="email"
                 type="email"
                 placeholder="Enter your email address"
-                className="pl-10 w-full bg-[#161b26] border border-[#21243b] rounded-lg p-3 focus:ring-[#3b82f6] focus:border-[#3b82f6] outline-none text-white text-sm transition placeholder:text-[#767692]"
+                className="pl-10"
                 {...register('email')}
               />
             </div>
@@ -96,7 +97,7 @@ const LoginPage: React.FC = () => {
                 id="password"
                 type="password"
                 placeholder="Enter your password"
-                className="pl-10 w-full bg-[#161b26] border border-[#21243b] rounded-lg p-3 focus:ring-[#3b82f6] focus:border-[#3b82f6] outline-none text-white text-sm transition placeholder:text-[#767692]"
+                className="pl-10"
                 {...register('password')}
               />
             </div>
@@ -105,17 +106,16 @@ const LoginPage: React.FC = () => {
             )}
           </div>
           <div className="flex justify-between items-center pt-0">
-            <a href="#" className="btn-link text-xs">Forgot password?</a>
+            <Button variant="link" type="button" className="text-xs">Forgot password?</Button>
           </div>
           <div className="flex justify-end items-center space-x-3 pt-1">
-            <button type="button" className="btn-link text-sm py-2.5 px-3">Create an account</button>
-            <button
+            <Button variant="link" type="button" className="text-sm">Create an account</Button>
+            <Button
               type="submit"
-              className="btn-accent py-2.5 px-6 text-sm shadow-lg"
               disabled={isLoading}
             >
               {isLoading ? 'Signing in...' : 'Sign in'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

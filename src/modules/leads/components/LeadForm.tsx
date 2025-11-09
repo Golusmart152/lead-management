@@ -132,7 +132,7 @@ const LeadForm: React.FC<LeadFormProps> = ({ open, onClose, onSubmit, lead }) =>
         variant: "default",
       });
       onClose();
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to save the lead. Please try again.",

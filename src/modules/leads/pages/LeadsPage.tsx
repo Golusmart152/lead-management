@@ -143,7 +143,7 @@ const LeadsPage: React.FC = () => {
 
   // Filter and sort leads
   const filteredAndSortedLeads = useMemo(() => {
-    let filtered = leads.filter(lead => {
+    const filtered = leads.filter(lead => {
       const searchLower = searchTerm.toLowerCase();
       return !searchTerm ||
         lead.name.toLowerCase().includes(searchLower) ||

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Edit, Shield, Users, Search, ChevronUp, ChevronDown, Mail } from 'lucide-react';
-import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../../../firebase/config';
 import { useNotification } from '../../notifications/useNotification';
 import { useToast } from '../../../hooks/use-toast';
@@ -32,7 +32,7 @@ interface User {
   email: string;
   role: string;
   name?: string;
-  createdAt?: any;
+  createdAt?: Timestamp;
 }
 
 const UserManagementPage: React.FC = () => {
@@ -105,7 +105,7 @@ const UserManagementPage: React.FC = () => {
 
   // Filter and sort users
   const filteredAndSortedUsers = useMemo(() => {
-    let filtered = users.filter(user => {
+    const filtered = users.filter(user => {
       const searchLower = searchTerm.toLowerCase();
       return !searchTerm || 
         user.email.toLowerCase().includes(searchLower) ||

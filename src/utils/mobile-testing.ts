@@ -9,14 +9,17 @@ export const getDeviceInfo = () => {
   const height = window.innerHeight;
   const userAgent = navigator.userAgent;
   
+  const deviceType: 'mobile' | 'tablet' | 'desktop' = width < 768 ? 'mobile' : width < 1024 ? 'tablet' : 'desktop';
+  const orientation: 'landscape' | 'portrait' = width > height ? 'landscape' : 'portrait';
+
   return {
     width,
     height,
     isMobile: width < 768,
     isTablet: width >= 768 && width < 1024,
     isDesktop: width >= 1024,
-    deviceType: width < 768 ? 'mobile' : width < 1024 ? 'tablet' : 'desktop',
-    orientation: width > height ? 'landscape' : 'portrait',
+    deviceType,
+    orientation,
     isIOS: /iPad|iPhone|iPod/.test(userAgent),
     isAndroid: /Android/.test(userAgent),
     isChrome: /Chrome/.test(userAgent),
@@ -42,7 +45,7 @@ export const getSafeArea = () => {
 };
 
 // Performance testing utilities
-export const measurePerformance = async (name: string, fn: () => Promise<any>) => {
+export const measurePerformance = async <T>(name: string, fn: () => Promise<T>): Promise<T> => {
   const start = performance.now();
   const result = await fn();
   const end = performance.now();
@@ -168,7 +171,7 @@ export const runMobileTests = () => {
   const results = Object.entries(testSuite).map(([name, test]) => {
     try {
       const result = test();
-      return { name, ...result, error: null };
+      return { name, ...result, error: null as string | null };
     } catch (error) {
       return { name, passed: false, message: 'Test failed', error: error instanceof Error ? error.message : String(error) };
     }
@@ -189,9 +192,102 @@ export const runMobileTests = () => {
   };
 };
 
+interface MobileTesting {    getDeviceInfo: () => {
+        width: number;
+        height: number;
+        isMobile: boolean;
+        isTablet: boolean;
+        isDesktop: boolean;
+        deviceType: "mobile" | "tablet" | "desktop";
+        orientation: "landscape" | "portrait";
+        isIOS: boolean;
+        isAndroid: boolean;
+        isChrome: boolean;
+        isSafari: boolean;
+        pixelRatio: number;
+    };
+    isTouchDevice: () => boolean;
+    getSafeArea: () => {
+        top: number;
+        right: number;
+        bottom: number;
+        left: number;
+    };
+    testMobileOptimizations: () => {
+        device: {
+            width: number;
+            height: number;
+            isMobile: boolean;
+            isTablet: boolean;
+            isDesktop: boolean;
+            deviceType: "mobile" | "tablet" | "desktop";
+            orientation: "landscape" | "portrait";
+            isIOS: boolean;
+            isAndroid: boolean;
+            isChrome: boolean;
+            isSafari: boolean;
+            pixelRatio: number;
+        };
+        issues: string[];
+        passed: boolean;
+        summary: string;
+    };
+    simulateDevice: (deviceType: 'mobile' | 'tablet' | 'desktop') => void;
+    runMobileTests: () => {
+        componentTests: {
+            name: string;
+            passed: boolean;
+            message: string;
+            error: string | null;
+        }[];
+        optimizationTest: {
+            device: {
+                width: number;
+                height: number;
+                isMobile: boolean;
+                isTablet: boolean;
+                isDesktop: boolean;
+                deviceType: "mobile" | "tablet" | "desktop";
+                orientation: "landscape" | "portrait";
+                isIOS: boolean;
+                isAndroid: boolean;
+                isChrome: boolean;
+                isSafari: boolean;
+                pixelRatio: number;
+            };
+            issues: string[];
+            passed: boolean;
+            summary: string;
+        };
+        overallScore: number;
+    };
+    createMobileTestSuite: () => {
+        navigation: () => {
+            passed: boolean;
+            message: string;
+        };
+        tables: () => {
+            passed: boolean;
+            message: string;
+        };
+        forms: () => {
+            passed: boolean;
+            message: string;
+        };
+        buttons: () => {
+            passed: boolean;
+            message: string;
+        };
+        performance: () => {
+            passed: boolean;
+            message: string;
+        };
+    };
+}
+
 // Development helper
 if (typeof window !== 'undefined') {
-  (window as any).mobileTesting = {
+  (window as unknown as { mobileTesting: MobileTesting }).mobileTesting = {
     getDeviceInfo,
     isTouchDevice,
     getSafeArea,

@@ -2,7 +2,7 @@
 # see: https://developers.google.com/idx/guides/customize-idx-env
 { pkgs, ... }: {
   # Which nixpkgs channel to use.
-  channel = "stable-24.05"; # or "unstable"
+  channel = "unstable"; # or "stable-24.05"
   # Use https://search.nixos.org/packages to find packages
   packages = [
     pkgs.nodejs_22
@@ -33,10 +33,11 @@
       enable = true;
       previews = {
         web = {
-          command = ["npm" "run" "dev" "--" "--port" "$PORT" "--host" "0.0.0.0"];
+          command = ["npm", "run", "dev:client", "--", "--port", "$PORT", "--host", "0.0.0.0"];
           manager = "web";
         };
       };
     };
   };
 }
+# Trigger rebuild

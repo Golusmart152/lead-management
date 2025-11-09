@@ -5,12 +5,12 @@ import { Badge } from './badge';
 import { ChevronDown, ChevronUp, MoreHorizontal, Mail, Phone } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
-interface MobileTableProps {
-  data: any[];
+interface MobileTableProps<T extends { id: string }> {
+  data: T[];
   columns: {
-    key: string;
+    key: keyof T | 'actions';
     title: string;
-    render?: (value: any, item: any) => React.ReactNode;
+    render?: (value: T[keyof T], item: T) => React.ReactNode;
     className?: string;
   }[];
   isLoading?: boolean;
@@ -25,12 +25,7 @@ const statusStyles = {
   overdue: 'bg-red-500/10 text-red-400 border-red-500/20'
 };
 
-export const MobileTable: React.FC<MobileTableProps> = ({
-  data,
-  columns,
-  isLoading = false,
-  emptyMessage = "No data available"
-}) => {
+export function MobileTable<T extends { id: string; email?: string; phone?: string; avatar?: string; status?: string }>({ data, columns, isLoading = false, emptyMessage = "No data available" }: MobileTableProps<T>) {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const toggleRow = (id: string) => {
@@ -85,21 +80,20 @@ export const MobileTable: React.FC<MobileTableProps> = ({
 
   return (
     <div className="space-y-4 md:hidden">
-      {data.map((item, index) => {
-        const id = item.id || index.toString();
-        const isExpanded = expandedRows.has(id);
-        const primaryValue = item[primaryColumn.key];
+      {data.map((item) => {
+        const isExpanded = expandedRows.has(item.id);
+        const primaryValue = item[primaryColumn.key as keyof T];
         const primaryContent = primaryColumn.render
           ? primaryColumn.render(primaryValue, item)
-          : primaryValue;
+          : primaryValue as React.ReactNode;
 
         return (
-          <Card key={id} variant="glass" className="overflow-hidden" interactive>
+          <Card key={item.id} variant="glass" className="overflow-hidden" interactive>
             <CardContent spacing="none" className="p-0">
               {/* Main Row */}
               <div
                 className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-700/20 transition-colors"
-                onClick={() => toggleRow(id)}
+                onClick={() => toggleRow(item.id)}
               >
                 <div className="flex items-center gap-4 flex-1 min-w-0">
                   {/* Avatar */}
@@ -160,11 +154,14 @@ export const MobileTable: React.FC<MobileTableProps> = ({
                 <div className="border-t border-gray-700/50 bg-gray-800/20">
                   <div className="p-4 space-y-4">
                     {detailColumns.map((column) => {
-                      const value = item[column.key];
+                       if (column.key === 'actions') {
+                        return column.render ? column.render(item, item) : null;
+                      }
+                      const value = item[column.key as keyof T];
                       if (!value) return null;
                       
                       return (
-                        <div key={column.key} className="flex justify-between items-start">
+                        <div key={column.key as string} className="flex justify-between items-start">
                           <span className="text-sm font-medium text-gray-400 w-1/3 truncate flex items-center gap-2">
                             {column.title}:
                           </span>
@@ -203,6 +200,4 @@ export const MobileTable: React.FC<MobileTableProps> = ({
       })}
     </div>
   );
-};
-
-export default MobileTable;
+}

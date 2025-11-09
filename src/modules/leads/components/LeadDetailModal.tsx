@@ -38,8 +38,6 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ open, onClose, lead }
     return null;
   }
 
-  // formatDate function removed - no longer needed for Lead interface
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -153,7 +151,7 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ open, onClose, lead }
                     Assigned To
                   </div>
                   <p className="text-sm">
-                    {lead.assignedTo && lead.assignedTo !== 'unassigned' ? lead.assignedTo : <span className="text-muted-foreground italic">Unassigned</span>}
+                    {lead.assignedTo && lead.assignedTo !== 'unassigned' ? String(lead.assignedTo) : <span className="text-muted-foreground italic">Unassigned</span>}
                   </p>
                 </div>
               </div>
@@ -177,7 +175,7 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ open, onClose, lead }
                     <Calendar className="h-4 w-4" />
                     Lead ID
                   </div>
-                  <p className="text-sm font-mono text-xs">{lead.visibleId}</p>
+                  <p className="text-sm font-mono text-xs">{String(lead.visibleId)}</p>
                 </div>
 
                 <div className="space-y-2">
@@ -185,7 +183,7 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ open, onClose, lead }
                     <Calendar className="h-4 w-4" />
                     UUID
                   </div>
-                  <p className="text-sm font-mono text-xs">{lead.uuid}</p>
+                  <p className="text-sm font-mono text-xs">{String(lead.uuid)}</p>
                 </div>
               </div>
             </CardContent>
@@ -204,7 +202,7 @@ const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ open, onClose, lead }
                 </CardHeader>
                 <CardContent>
                   <div className="p-4 bg-muted/50 rounded-lg">
-                    <p className="text-sm whitespace-pre-wrap">{lead.notes}</p>
+                    <p className="text-sm whitespace-pre-wrap">{String(lead.notes)}</p>
                   </div>
                 </CardContent>
               </Card>

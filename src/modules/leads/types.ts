@@ -10,5 +10,5 @@ export interface Lead {
     status: LeadStatus;
     createdAt: Date;
     updatedAt: Date;
-    [key: string]: any;
+    [key: string]: string | Date | LeadStatus | undefined;
 }

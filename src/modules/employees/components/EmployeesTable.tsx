@@ -75,7 +75,7 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({ employees, onEdit, onDe
 
   // Filter and sort employees
   const filteredAndSortedEmployees = useMemo(() => {
-    let filtered = employees.filter(employee => {
+    const filtered = employees.filter(employee => {
       const matchesSearch = !searchTerm ||
         employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -91,8 +91,8 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({ employees, onEdit, onDe
 
     // Sort
     filtered.sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
+      let aValue: string | number;
+      let bValue: string | number;
 
       if (sortConfig.key === 'role.name') {
         aValue = a.role?.name || '';
@@ -101,8 +101,8 @@ const EmployeesTable: React.FC<EmployeesTableProps> = ({ employees, onEdit, onDe
         aValue = a.department?.name || '';
         bValue = b.department?.name || '';
       } else {
-        aValue = a[sortConfig.key];
-        bValue = b[sortConfig.key];
+        aValue = a[sortConfig.key as keyof Employee] as string | number;
+        bValue = b[sortConfig.key as keyof Employee] as string | number;
       }
 
       if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;

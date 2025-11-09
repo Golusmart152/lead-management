@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
-import { createContext } from 'react';
 import type { ReactNode } from 'react';
-
-interface NotificationContextType {
-    showNotification: (message: string, severity: 'success' | 'error' | 'info' | 'warning') => void;
-}
-
-export const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
+import { NotificationContext } from './NotificationContext';
 
 interface NotificationProviderProps {
     children: ReactNode;
@@ -17,7 +11,7 @@ const NotificationDisplay: React.FC<{
     notifications: Array<{
         id: string;
         message: string;
-        severity: 'success' | 'error' | 'info' | 'warning';
+        variant: 'success' | 'error' | 'default';
     }>;
 }> = ({ notifications }) => (
     <div className="fixed top-4 right-4 z-50 space-y-2">
@@ -25,9 +19,8 @@ const NotificationDisplay: React.FC<{
             <div
                 key={notification.id}
                 className={`p-4 rounded-lg shadow-lg max-w-sm ${
-                    notification.severity === 'success' ? 'bg-green-500 text-white' :
-                    notification.severity === 'error' ? 'bg-red-500 text-white' :
-                    notification.severity === 'warning' ? 'bg-yellow-500 text-white' :
+                    notification.variant === 'success' ? 'bg-green-500 text-white' :
+                    notification.variant === 'error' ? 'bg-red-500 text-white' :
                     'bg-blue-500 text-white'
                 }`}
             >
@@ -41,12 +34,12 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     const [notifications, setNotifications] = useState<Array<{
         id: string;
         message: string;
-        severity: 'success' | 'error' | 'info' | 'warning';
+        variant: 'success' | 'error' | 'default';
     }>>([]);
 
-    const showNotification = (message: string, severity: 'success' | 'error' | 'info' | 'warning') => {
+    const showNotification = (message: string, variant: 'success' | 'error' | 'default') => {
         const id = Math.random().toString(36).substr(2, 9);
-        const notification = { id, message, severity };
+        const notification = { id, message, variant };
         
         setNotifications(prev => [...prev, notification]);
         

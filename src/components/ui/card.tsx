@@ -3,7 +3,7 @@ import * as React from "react"
 import { cn } from "../../lib/utils"
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'glass' | 'subtle' | 'elevated';
+  variant?: 'glass' | 'subtle' | 'elevated';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   interactive?: boolean;
   focusable?: boolean;
@@ -11,11 +11,10 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = 'glass', size = 'md', interactive = false, focusable = false, ...props }, ref) => {
-    const baseClasses = "ds-card rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 overflow-hidden";
+    const baseClasses = "rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 overflow-hidden";
     
     const variantClasses = {
-      default: "bg-gray-800 border-gray-700",
-      glass: "card-bg-neo bg-opacity-90",
+      glass: "card-bg-neo",
       subtle: "ds-glass-subtle",
       elevated: "ds-glass-surface shadow-2xl"
     };

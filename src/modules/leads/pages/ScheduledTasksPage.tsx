@@ -157,7 +157,7 @@ const ScheduledTasksPage: React.FC = () => {
 
   // Filter and sort follow-ups
   const filteredAndSortedFollowUps = useMemo(() => {
-    let filtered = followUps.filter(followUp => {
+    const filtered = followUps.filter(followUp => {
       const searchLower = searchTerm.toLowerCase();
       const matchesSearch = !searchTerm || 
         (followUp.clientName && followUp.clientName.toLowerCase().includes(searchLower)) ||

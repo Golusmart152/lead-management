@@ -126,7 +126,7 @@ const CustomerPage: React.FC = () => {
 
   // Filter and sort customers
   const filteredAndSortedCustomers = useMemo(() => {
-    let filtered = customers.filter(customer => {
+    const filtered = customers.filter(customer => {
       const searchLower = searchTerm.toLowerCase();
       return !searchTerm || 
         customer.name.toLowerCase().includes(searchLower) ||

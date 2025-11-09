@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
 import { useForm, Controller, type SubmitHandler } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
 import {
     Dialog,
     DialogContent,
@@ -11,6 +9,8 @@ import {
 } from '../../../components/ui/dialog';
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent } from '../../../components/ui/card';
+import { Input } from '../../../components/ui/input';
+import { Textarea } from '../../../components/ui/textarea';
 import type { Customer } from '../types';
 
 interface CustomerFormProps {
@@ -23,18 +23,10 @@ interface CustomerFormProps {
 interface CustomerFormData {
     name: string;
     email: string;
-    phone: string;
-    company: string;
-    address: string;
+    phone?: string;
+    company?: string;
+    address?: string;
 }
-
-const schema = yup.object().shape({
-    name: yup.string().required('Name is required'),
-    email: yup.string().email('Invalid email').required('Email is required'),
-    phone: yup.string().notRequired(),
-    company: yup.string().notRequired(),
-    address: yup.string().notRequired(),
-});
 
 const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSubmit, customer }) => {
     const {
@@ -43,7 +35,6 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSubmit, cu
         reset,
         formState: { errors },
     } = useForm<CustomerFormData>({
-        resolver: yupResolver(schema) as any,
         defaultValues: {
             name: '',
             email: '',
@@ -91,12 +82,13 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSubmit, cu
                                 <Controller
                                     name="name"
                                     control={control}
+                                    rules={{ required: 'Name is required' }}
                                     render={({ field }) => (
-                                        <input
+                                        <Input
                                             {...field}
                                             id="name"
                                             placeholder="Enter name"
-                                            className={`w-full bg-[#161b26] border border-[#21243b] rounded-lg p-3 focus:ring-[#3b82f6] focus:border-[#3b82f6] outline-none text-white text-sm transition placeholder:text-[#767692] ${!!errors.name ? "border-red-500" : ""}`}
+                                            className={errors.name ? "border-red-500" : ""}
                                         />
                                     )}
                                 />
@@ -110,13 +102,14 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSubmit, cu
                                 <Controller
                                     name="email"
                                     control={control}
+                                    rules={{ required: 'Email is required', pattern: { value: /\S+@\S+\.\S+/, message: 'Invalid email' } }}
                                     render={({ field }) => (
-                                        <input
+                                        <Input
                                             {...field}
                                             id="email"
                                             type="email"
                                             placeholder="Enter email"
-                                            className={`w-full bg-[#161b26] border border-[#21243b] rounded-lg p-3 focus:ring-[#3b82f6] focus:border-[#3b82f6] outline-none text-white text-sm transition placeholder:text-[#767692] ${!!errors.email ? "border-red-500" : ""}`}
+                                            className={errors.email ? "border-red-500" : ""}
                                         />
                                     )}
                                 />
@@ -132,11 +125,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSubmit, cu
                                         name="phone"
                                         control={control}
                                         render={({ field }) => (
-                                            <input
+                                            <Input
                                                 {...field}
                                                 id="phone"
                                                 placeholder="Enter phone"
-                                                className="w-full bg-[#161b26] border border-[#21243b] rounded-lg p-3 focus:ring-[#3b82f6] focus:border-[#3b82f6] outline-none text-white text-sm transition placeholder:text-[#767692]"
                                             />
                                         )}
                                     />
@@ -148,11 +140,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSubmit, cu
                                         name="company"
                                         control={control}
                                         render={({ field }) => (
-                                            <input
+                                            <Input
                                                 {...field}
                                                 id="company"
                                                 placeholder="Enter company"
-                                                className="w-full bg-[#161b26] border border-[#21243b] rounded-lg p-3 focus:ring-[#3b82f6] focus:border-[#3b82f6] outline-none text-white text-sm transition placeholder:text-[#767692]"
                                             />
                                         )}
                                     />
@@ -165,24 +156,22 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ open, onClose, onSubmit, cu
                                     name="address"
                                     control={control}
                                     render={({ field }) => (
-                                        <textarea
+                                        <Textarea
                                             {...field}
                                             id="address"
                                             placeholder="Enter address"
-                                            className="w-full bg-[#161b26] border border-[#21243b] rounded-lg p-3 focus:ring-[#3b82f6] focus:border-[#3b82f6] outline-none text-white text-sm transition placeholder:text-[#767692] resize-none"
                                             rows={3}
                                         />
                                     )}
                                 />
                             </div>
                         <div className="flex justify-end items-center space-x-3 pt-1">
-                            <Button type="button" className="btn-link text-sm py-2.5 px-3" onClick={onClose}>
-                                Cancel
-                            </Button>
-                            <Button type="submit" className="btn-accent py-2.5 px-6 text-sm shadow-lg">
+                            <Button variant="link" type="button" onClick={onClose}>Cancel</Button>
+                            <Button type="submit">
                                 {customer ? 'Save' : 'Add'}
                             </Button>
                         </div>
+                        </form>
                     </CardContent>
                 </Card>
             </DialogContent>

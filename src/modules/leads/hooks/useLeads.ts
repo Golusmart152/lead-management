@@ -19,7 +19,7 @@ export const useLeads = () => {
             setLoading(true);
             const leadsFromDb = await fetchLeadsFromDb();
             setLeads(leadsFromDb);
-        } catch (error) {
+        } catch {
             showNotification('Failed to fetch leads', 'error');
         } finally {
             setLoading(false);
@@ -35,7 +35,7 @@ export const useLeads = () => {
             const newLead = await addLeadToDb(lead);
             setLeads((prevLeads) => [...prevLeads, newLead]);
             showNotification('Lead added successfully', 'success');
-        } catch (error) {
+        } catch {
             showNotification('Failed to add lead', 'error');
         }
     };
@@ -51,7 +51,7 @@ export const useLeads = () => {
             } else {
                 showNotification('Failed to update lead', 'error');
             }
-        } catch (error) {
+        } catch {
             showNotification('Failed to update lead', 'error');
         }
     };
@@ -61,7 +61,7 @@ export const useLeads = () => {
             await deleteLeadFromDb(id);
             setLeads((prevLeads) => prevLeads.filter((l) => l.id !== id));
             showNotification('Lead deleted successfully', 'success');
-        } catch (error) {
+        } catch {
             showNotification('Failed to delete lead', 'error');
         }
     };

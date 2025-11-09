@@ -1,0 +1,91 @@
+
+body {
+      font-family: 'Inter',sans-serif;
+      color: #e0e0e0;
+      background: #141416;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+    /* SVG Polygon layers for angular background */
+    .polygon-svg-bg {
+      position: absolute;
+      inset: 0;
+      width: 100vw; height: 100vh;
+      z-index: -4;
+      pointer-events: none;
+    }
+    /* Glassy angular overlays for extra depth */
+    .overlay-shape {
+      position: absolute;
+      z-index: -3;
+      opacity: .66;
+      pointer-events: none;
+      filter: blur(2.2px);
+      mix-blend-mode: lighten;
+    }
+    .shape1 {
+      top: 7vh; left: 12vw;
+      width: 39vw; height: 39vh;
+      background: linear-gradient(125deg, #252c3e 60%, #212e4a90 100%);
+      clip-path: polygon(14% 0%,100% 9%,85% 92%,0% 100%);
+      transform: rotate(-10deg);
+      opacity: .44;
+    }
+    .shape2 {
+      bottom: 7vh; left: 44vw;
+      width: 38vw; height: 32vh;
+      background: linear-gradient(65deg, #1c2338 78%, #273053 100%);
+      clip-path: polygon(24% 2%,100% 6%,77% 80%,7% 100%);
+      opacity:.32;
+      transform: rotate(9deg);
+    }
+    .shape3 {
+      top: 26vh; right: 7vw;
+      width: 27vw; height: 22vh;
+      background: linear-gradient(92deg, #171d31 66%, #333b5f88 97%);
+      clip-path: polygon(10% 0%,92% 19%,75% 100%,0 81%);
+      opacity: .19;
+      filter: blur(3.4px);
+    }
+    .background-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 120% 80% at 53% 54%, #21243b33 0%, #141416 65%, #141416 100%);
+      opacity: 0.27;
+      z-index: -1;
+      pointer-events: none;
+    }
+    .card-bg-neo {
+      background: rgba(19,24,36,0.91);
+      border-radius: 1.3rem;
+      border: 1.2px solid #24263d;
+      box-shadow: 0 10px 44px 0 #11121744, 0 2px 12px 0 #0a0a0e1a;
+      backdrop-filter: blur(1.5px);
+      -webkit-backdrop-filter: blur(1.5px);
+      transition: box-shadow 0.14s;
+    }
+    input:focus, button:focus {
+      outline: 2px solid #3b82f6;
+      outline-offset: 1.5px;
+    }
+    ::placeholder { color: #a0a0b2 !important; opacity: 1; }
+    .btn-accent {
+      background: #3b82f6;
+      color: #fff;
+      border-radius: 0.7rem;
+      font-weight: 500;
+      box-shadow: 0 3px 10px #3b82f633;
+      transition: background 0.15s;
+    }
+    .btn-accent:hover {
+      background: #2564af;
+    }
+    .btn-link {
+      color: #3b82f6;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .btn-link:hover {
+      color: #68a3f6;
+    }

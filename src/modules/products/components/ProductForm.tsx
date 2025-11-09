@@ -2,6 +2,9 @@
 import React, { useEffect } from 'react';
 import { useForm, Controller, type SubmitHandler } from 'react-hook-form';
 import { type Product } from '../types';
+import { Input } from '../../../components/ui/input';
+import { Textarea } from '../../../components/ui/textarea';
+import { Button } from '../../../components/ui/button';
 
 interface ProductFormProps {
     open: boolean;
@@ -11,9 +14,8 @@ interface ProductFormProps {
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSubmit, product }) => {
-  if (!open) return null;
     const { control, handleSubmit, reset, formState: { errors } } = useForm<Omit<Product, 'id'> | Product>({
-        defaultValues: {
+        defaultValues: product || {
             name: '',
             description: '',
             price: 0,
@@ -41,6 +43,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSubmit, prod
         onClose();
     };
 
+    if (!open) return null;
+
     return (
         <div className="min-h-screen flex items-center justify-center py-14 px-4 relative z-10">
             <div className="card-bg-neo w-full max-w-md p-8 md:p-10 shadow-2xl border border-[#24263d] space-y-7">
@@ -55,11 +59,11 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSubmit, prod
                             control={control}
                             rules={{ required: 'Name is required' }}
                             render={({ field }) => (
-                                <input
+                                <Input
                                     {...field}
                                     id="name"
                                     placeholder="Enter product name"
-                                    className={`w-full bg-[#161b26] border border-[#21243b] rounded-lg p-3 focus:ring-[#3b82f6] focus:border-[#3b82f6] outline-none text-white text-sm transition placeholder:text-[#767692] ${errors.name ? 'border-red-500' : ''}`}
+                                    className={errors.name ? 'border-red-500' : ''}
                                 />
                             )}
                         />
@@ -75,11 +79,11 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSubmit, prod
                             control={control}
                             rules={{ required: 'Category is required' }}
                             render={({ field }) => (
-                                <input
+                                <Input
                                     {...field}
                                     id="category"
                                     placeholder="Product category"
-                                    className={`w-full bg-[#161b26] border border-[#21243b] rounded-lg p-3 focus:ring-[#3b82f6] focus:border-[#3b82f6] outline-none text-white text-sm transition placeholder:text-[#767692] ${errors.category ? 'border-red-500' : ''}`}
+                                    className={errors.category ? 'border-red-500' : ''}
                                 />
                             )}
                         />
@@ -98,13 +102,13 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSubmit, prod
                                 min: { value: 0, message: 'Price cannot be negative' }
                             }}
                             render={({ field }) => (
-                                <input
+                                <Input
                                     {...field}
                                     id="price"
                                     type="number"
                                     step="0.01"
                                     placeholder="0.00"
-                                    className={`w-full bg-[#161b26] border border-[#21243b] rounded-lg p-3 focus:ring-[#3b82f6] focus:border-[#3b82f6] outline-none text-white text-sm transition placeholder:text-[#767692] ${errors.price ? 'border-red-500' : ''}`}
+                                    className={errors.price ? 'border-red-500' : ''}
                                     onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                 />
                             )}
@@ -121,12 +125,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSubmit, prod
                             control={control}
                             rules={{ required: 'Description is required' }}
                             render={({ field }) => (
-                                <textarea
+                                <Textarea
                                     {...field}
                                     id="description"
                                     placeholder="Product description"
                                     rows={4}
-                                    className={`w-full bg-[#161b26] border border-[#21243b] rounded-lg p-3 focus:ring-[#3b82f6] focus:border-[#3b82f6] outline-none text-white text-sm transition placeholder:text-[#767692] resize-none ${errors.description ? 'border-red-500' : ''}`}
+                                    className={errors.description ? 'border-red-500' : ''}
                                 />
                             )}
                         />
@@ -136,12 +140,10 @@ const ProductForm: React.FC<ProductFormProps> = ({ open, onClose, onSubmit, prod
                     </div>
 
                     <div className="flex justify-end items-center space-x-3 pt-1">
-                        <button type="button" className="btn-link text-sm py-2.5 px-3" onClick={onClose}>
-                            Cancel
-                        </button>
-                        <button type="submit" className="btn-accent py-2.5 px-6 text-sm shadow-lg" disabled={false}>
+                        <Button variant="link" type="button" onClick={onClose}>Cancel</Button>
+                        <Button type="submit" disabled={false}>
                             {product ? 'Save Changes' : 'Add Product'}
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </div>

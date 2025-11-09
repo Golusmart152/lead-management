@@ -10,22 +10,42 @@ interface PerformanceMetric {
   category: 'navigation' | 'paint' | 'largest-contentful-paint' | 'cumulative-layout-shift' | 'first-input' | 'custom';
 }
 
+interface PerformanceMemory {
+    usedJSHeapSize: number;
+    totalJSHeapSize: number;
+    jsHeapSizeLimit: number;
+}
+
+interface NetworkInformation extends EventTarget {
+    readonly effectiveType: 'slow-2g' | '2g' | '3g' | '4g';
+    readonly downlink: number;
+}
+
+interface LayoutShift extends PerformanceEntry {
+    value: number;
+    hadRecentInput: boolean;
+}
+
+interface PerformanceEventTiming extends PerformanceEntry {
+    processingStart: number;
+}
+
 interface PerformanceReport {
   coreWebVitals: {
     lcp: number | null;
     fid: number | null;
     cls: number | null;
   };
-  navigation: any; // Compatible with different browser APIs
+  navigation: PerformanceNavigationTiming | Record<string, never>; // Compatible with different browser APIs
   paint: PerformanceEntry[];
   custom: PerformanceMetric[];
   summary: {
     totalLoadTime: number;
     domContentLoaded: number;
     fullyLoaded: number;
-    memoryUsage?: any;
+    memoryUsage?: PerformanceMemory;
     deviceInfo: {
-      connection?: any;
+      connection?: NetworkInformation;
       userAgent: string;
       viewport: { width: number; height: number };
     };
@@ -67,22 +87,22 @@ export class PerformanceMonitor {
           this.recordMetric('LCP', lastEntry.startTime, 'largest-contentful-paint');
         });
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
-      } catch (e) {
+      } catch {
         console.warn('LCP observation not supported');
       }
 
       // First Input Delay (FID)
       try {
         const fidObserver = new PerformanceObserver((entryList) => {
-          const entries = entryList.getEntries();
-          entries.forEach((entry: any) => {
+          const entries = entryList.getEntries() as PerformanceEventTiming[];
+          entries.forEach((entry) => {
             if (entry.processingStart && entry.startTime) {
               this.recordMetric('FID', entry.processingStart - entry.startTime, 'first-input');
             }
           });
         });
         fidObserver.observe({ entryTypes: ['first-input'] });
-      } catch (e) {
+      } catch {
         console.warn('FID observation not supported');
       }
 
@@ -90,8 +110,8 @@ export class PerformanceMonitor {
       try {
         let clsValue = 0;
         const clsObserver = new PerformanceObserver((entryList) => {
-          const entries = entryList.getEntries();
-          entries.forEach((entry: any) => {
+          const entries = entryList.getEntries() as LayoutShift[];
+          entries.forEach((entry) => {
             if (!entry.hadRecentInput && entry.value) {
               clsValue += entry.value;
             }
@@ -99,7 +119,7 @@ export class PerformanceMonitor {
           this.recordMetric('CLS', clsValue, 'cumulative-layout-shift');
         });
         clsObserver.observe({ entryTypes: ['layout-shift'] });
-      } catch (e) {
+      } catch {
         console.warn('CLS observation not supported');
       }
     }
@@ -109,16 +129,16 @@ export class PerformanceMonitor {
     window.addEventListener('load', () => {
       setTimeout(() => {
         try {
-          const navigation = performance.getEntriesByType('navigation')[0] as any;
+          const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
           if (navigation) {
             this.recordMetric('DNS Lookup', navigation.domainLookupEnd - navigation.domainLookupStart, 'navigation');
             this.recordMetric('TCP Connect', navigation.connectEnd - navigation.connectStart, 'navigation');
             this.recordMetric('Request', navigation.responseStart - navigation.requestStart, 'navigation');
             this.recordMetric('Response', navigation.responseEnd - navigation.responseStart, 'navigation');
-            this.recordMetric('DOM Processing', (navigation.domComplete || navigation.domContentLoadedEventEnd) - (navigation.domLoading || navigation.domContentLoadedEventStart), 'navigation');
+            this.recordMetric('DOM Processing', navigation.domComplete - navigation.domInteractive, 'navigation');
             this.recordMetric('Load Complete', navigation.loadEventEnd - navigation.loadEventStart, 'navigation');
           }
-        } catch (e) {
+        } catch {
           console.warn('Navigation timing not available');
         }
       }, 0);
@@ -135,15 +155,15 @@ export class PerformanceMonitor {
           });
         });
         this.observer.observe({ entryTypes: ['paint'] });
-      } catch (e) {
+      } catch {
         console.warn('Paint observation not supported');
       }
     }
   }
 
   private recordMemoryUsage() {
-    if ((performance as any).memory) {
-      const memory = (performance as any).memory;
+    if ((performance as unknown as { memory: PerformanceMemory }).memory) {
+      const memory = (performance as unknown as { memory: PerformanceMemory }).memory;
       this.recordMetric('Used JS Heap', memory.usedJSHeapSize, 'custom');
       this.recordMetric('Total JS Heap', memory.totalJSHeapSize, 'custom');
       this.recordMetric('JS Heap Limit', memory.jsHeapSizeLimit, 'custom');
@@ -151,8 +171,8 @@ export class PerformanceMonitor {
   }
 
   private recordNetworkInfo() {
-    if ((navigator as any).connection) {
-      const connection = (navigator as any).connection;
+    if ((navigator as unknown as { connection: NetworkInformation }).connection) {
+      const connection = (navigator as unknown as { connection: NetworkInformation }).connection;
       this.recordMetric('Connection Type', connection.effectiveType === '4g' ? 4 : connection.effectiveType === '3g' ? 3 : 2, 'custom');
       this.recordMetric('Downlink Speed', connection.downlink, 'custom');
     }
@@ -196,7 +216,7 @@ export class PerformanceMonitor {
   }
 
   public generateReport(): PerformanceReport {
-    const navigation = performance.getEntriesByType('navigation')[0] as any;
+    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
     const paint = performance.getEntriesByType('paint');
     
     // Extract Core Web Vitals
@@ -210,24 +230,16 @@ export class PerformanceMonitor {
         fid: fidMetric?.value || null,
         cls: clsMetric?.value || null,
       },
-      navigation: navigation ? {
-        domainLookupEnd: navigation.domainLookupEnd - navigation.domainLookupStart,
-        connectEnd: navigation.connectEnd - navigation.connectStart,
-        responseEnd: navigation.responseEnd - navigation.responseStart,
-        domComplete: (navigation.domComplete || navigation.domContentLoadedEventEnd) - (navigation.domLoading || navigation.domContentLoadedEventStart),
-        loadEventEnd: navigation.loadEventEnd - navigation.loadEventStart,
-        type: navigation.type,
-        redirectCount: navigation.redirectCount
-      } : {},
+      navigation,
       paint,
       custom: this.metrics,
       summary: {
-        totalLoadTime: navigation ? (navigation.loadEventEnd || navigation.loadEventStart) - (navigation.navigationStart || navigation.fetchStart) : 0,
-        domContentLoaded: navigation ? (navigation.domContentLoadedEventEnd || navigation.domContentLoadedEventStart) - (navigation.navigationStart || navigation.fetchStart) : 0,
-        fullyLoaded: navigation ? (navigation.loadEventEnd || navigation.loadEventStart) - (navigation.navigationStart || navigation.fetchStart) : 0,
-        memoryUsage: (performance as any).memory,
+        totalLoadTime: navigation ? navigation.loadEventEnd - navigation.startTime : 0,
+        domContentLoaded: navigation ? navigation.domContentLoadedEventEnd - navigation.startTime : 0,
+        fullyLoaded: navigation ? navigation.loadEventEnd - navigation.startTime : 0,
+        memoryUsage: (performance as unknown as { memory: PerformanceMemory }).memory,
         deviceInfo: {
-          connection: (navigator as any).connection,
+          connection: (navigator as unknown as { connection: NetworkInformation }).connection,
           userAgent: navigator.userAgent,
           viewport: {
             width: window.innerWidth,
@@ -357,7 +369,11 @@ if (typeof window !== 'undefined') {
 
 // Development helper
 if (typeof window !== 'undefined') {
-  (window as any).performanceMonitor = {
+    (window as unknown as { performanceMonitor: {        monitor: PerformanceMonitor;
+        report: () => PerformanceReport;
+        score: () => { score: number; rating: 'poor' | 'needs-improvement' | 'good'; issues: string[] };
+        export: () => string;
+    } }).performanceMonitor = {
     monitor: performanceMonitor,
     report: () => performanceMonitor.generateReport(),
     score: () => performanceMonitor.getScore(),

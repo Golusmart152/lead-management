@@ -53,7 +53,7 @@ const EditFollowUpModal: React.FC<EditFollowUpModalProps> = ({ open, onClose, fo
       await onUpdate(editedFollowUp);
       showNotification('Follow-up updated successfully!', 'success');
       onClose();
-    } catch (error) {
+    } catch {
       showNotification('Error updating follow-up', 'error');
     } finally {
       setLoading(false);

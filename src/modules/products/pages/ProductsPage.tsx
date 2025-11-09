@@ -134,7 +134,7 @@ const ProductsPage: React.FC = () => {
 
   // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
-    let filtered = products.filter(product => {
+    const filtered = products.filter(product => {
       const searchLower = searchTerm.toLowerCase();
       return !searchTerm ||
         product.name.toLowerCase().includes(searchLower) ||

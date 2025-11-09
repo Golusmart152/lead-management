@@ -5,12 +5,11 @@ import { ScrollArea } from './scroll-area';
 interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
   layout?: 'auto' | 'fixed';
   variant?: 'default' | 'striped' | 'compact';
-  interactive?: boolean;
   className?: string;
 }
 
 const TableRoot = React.forwardRef<HTMLDivElement, TableProps>(
-  ({ className, children, layout = 'auto', variant = 'default', interactive = true, ...props }, ref) => {
+  ({ className, children, layout = 'auto', variant = 'default', ...props }, ref) => {
     const layoutClass = layout === 'fixed' ? 'table-fixed' : 'table-auto';
     const variantClass = variant === 'striped' ? 'ds-table-striped' : variant === 'compact' ? 'ds-table-compact' : '';
     
@@ -35,9 +34,7 @@ const TableRoot = React.forwardRef<HTMLDivElement, TableProps>(
 );
 TableRoot.displayName = 'Table';
 
-interface TableHeaderProps extends React.HTMLAttributes<HTMLTableSectionElement> {}
-
-const TableHeader = React.forwardRef<HTMLTableSectionElement, TableHeaderProps>(
+const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
   ({ className, ...props }, ref) => (
     <thead
       ref={ref}
@@ -51,9 +48,7 @@ const TableHeader = React.forwardRef<HTMLTableSectionElement, TableHeaderProps>(
 );
 TableHeader.displayName = 'TableHeader';
 
-interface TableBodyProps extends React.HTMLAttributes<HTMLTableSectionElement> {}
-
-const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
+const TableBody = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
   ({ className, ...props }, ref) => (
     <tbody
       ref={ref}
@@ -67,9 +62,7 @@ const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
 );
 TableBody.displayName = 'TableBody';
 
-interface TableFooterProps extends React.HTMLAttributes<HTMLTableSectionElement> {}
-
-const TableFooter = React.forwardRef<HTMLTableSectionElement, TableFooterProps>(
+const TableFooter = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
   ({ className, ...props }, ref) => (
     <tfoot
       ref={ref}
@@ -127,9 +120,7 @@ const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
 );
 TableHead.displayName = 'TableHead';
 
-interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {}
-
-const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
+const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HTMLTableCellElement>>(
   ({ className, ...props }, ref) => (
     <td
       ref={ref}
@@ -144,9 +135,7 @@ const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
 );
 TableCell.displayName = 'TableCell';
 
-interface TableCaptionProps extends React.HTMLAttributes<HTMLTableCaptionElement> {}
-
-const TableCaption = React.forwardRef<HTMLTableCaptionElement, TableCaptionProps>(
+const TableCaption = React.forwardRef<HTMLTableCaptionElement, React.HTMLAttributes<HTMLTableCaptionElement>>(
   ({ className, ...props }, ref) => (
     <caption
       ref={ref}
@@ -158,9 +147,7 @@ const TableCaption = React.forwardRef<HTMLTableCaptionElement, TableCaptionProps
 TableCaption.displayName = 'TableCaption';
 
 // Specialized header cells
-interface TableColumnHeaderCellProps extends React.ThHTMLAttributes<HTMLTableCellElement> {}
-
-const TableColumnHeaderCell = React.forwardRef<HTMLTableCellElement, TableColumnHeaderCellProps>(
+const TableColumnHeaderCell = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<HTMLTableCellElement>>(
   ({ className, ...props }, ref) => (
     <th
       className={cn(
@@ -175,9 +162,7 @@ const TableColumnHeaderCell = React.forwardRef<HTMLTableCellElement, TableColumn
 );
 TableColumnHeaderCell.displayName = 'TableColumnHeaderCell';
 
-interface TableRowHeaderCellProps extends React.ThHTMLAttributes<HTMLTableCellElement> {}
-
-const TableRowHeaderCell = React.forwardRef<HTMLTableCellElement, TableRowHeaderCellProps>(
+const TableRowHeaderCell = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<HTMLTableCellElement>>(
   ({ className, ...props }, ref) => (
     <th
       className={cn(
@@ -288,14 +273,7 @@ export {
 // Export types
 export type {
   TableProps,
-  TableHeaderProps,
-  TableBodyProps,
-  TableFooterProps,
-  TableHeadProps,
   TableRowProps,
-  TableCellProps,
-  TableCaptionProps,
-  TableColumnHeaderCellProps,
-  TableRowHeaderCellProps,
+  TableHeadProps,
   DataTableProps,
 };
